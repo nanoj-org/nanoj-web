@@ -1,4 +1,4 @@
-package org.nanoj.web.tinymvc ;
+package org.nanoj.web.tinymvc.env ;
 
 import java.util.HashMap;
 

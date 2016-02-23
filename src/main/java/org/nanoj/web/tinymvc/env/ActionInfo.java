@@ -1,10 +1,11 @@
-package org.nanoj.web.tinymvc ;
+package org.nanoj.web.tinymvc.env ;
 
 /**
- * Bean containing information about the current action <br>
- * Stored in the request scope and usable in the JSP with E.L.
+ * Object containing information about the current action <br>
+ * Stored in the request scope and usable in the JSP with 'E.L.' <br>
+ * Keep this class public in order to be usable in JSP <br>
  *  
- * @author Laurent Guerin
+ * @author Laurent GUERIN
  *
  */
 public class ActionInfo {
@@ -27,7 +28,7 @@ public class ActionInfo {
 	 * @param name
 	 * @param method
 	 */
-	protected ActionInfo(String root, String name, String method) {
+	public ActionInfo(String root, String name, String method) {
 		super();
 		this.root = root;
 		this.name = name;

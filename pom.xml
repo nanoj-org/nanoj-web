@@ -33,6 +33,12 @@
 			<version>0.8.1-SNAPSHOT</version>
 		</dependency>
  
+		<dependency>
+			<groupId>nanoj</groupId>
+			<artifactId>nanoj-injector</artifactId>
+			<version>0.8.1-SNAPSHOT</version>
+		</dependency>
+
 		<!-- FOR TESTS -->
 		<dependency>
 			<groupId>junit</groupId>

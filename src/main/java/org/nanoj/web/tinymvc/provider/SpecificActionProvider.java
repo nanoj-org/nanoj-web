@@ -1,6 +1,9 @@
-package org.nanoj.web.tinymvc ;
+package org.nanoj.web.tinymvc.provider ;
 
 import java.util.Map;
+
+import org.nanoj.web.tinymvc.Action;
+import org.nanoj.web.tinymvc.TinyMvcException;
 
 /**
  * Standard provider for actions <br>
@@ -9,12 +12,12 @@ import java.util.Map;
  * @author Laurent Guerin
  *
  */
-public class StandardActionProvider implements ActionProvider {
+public class SpecificActionProvider implements ActionProvider {
 
 	private final Map<String, Class<? extends Action > > map ;
 	
 	
-	public StandardActionProvider( Map<String, Class<? extends Action>> map) {
+	public SpecificActionProvider( Map<String, Class<? extends Action>> map) {
 		super();
 		if ( map != null ) {
 			this.map = map;

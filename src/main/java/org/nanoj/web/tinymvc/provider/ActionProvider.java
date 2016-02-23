@@ -1,4 +1,6 @@
-package org.nanoj.web.tinymvc ;
+package org.nanoj.web.tinymvc.provider ;
+
+import org.nanoj.web.tinymvc.Action;
 
 /**
  * Action Provider interface <br>

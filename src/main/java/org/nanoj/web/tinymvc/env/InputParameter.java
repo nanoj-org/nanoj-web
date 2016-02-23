@@ -1,4 +1,4 @@
-package org.nanoj.web.tinymvc ;
+package org.nanoj.web.tinymvc.env ;
 
 public class InputParameter<T> {
 

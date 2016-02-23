@@ -1,4 +1,6 @@
-package org.nanoj.web.tinymvc ;
+package org.nanoj.web.tinymvc.provider ;
+
+import org.nanoj.web.tinymvc.TinyMvcException;
 
 /**
  * Utility class 
@@ -6,7 +8,7 @@ package org.nanoj.web.tinymvc ;
  * @author Laurent Guerin
  *
  */
-public class Util {
+public class InstanceProvider {
 
 	/**
 	 * Uses the current class loader to load the given class
@@ -16,7 +18,7 @@ public class Util {
 	private final static Class<?> loadClass(String className ) {
 		if ( className != null ) { 
 			//--- Try to load the class
-			ClassLoader classLoader = Util.class.getClassLoader() ;
+			ClassLoader classLoader = InstanceProvider.class.getClassLoader() ;
 			Class<?> clazz = null ;
 			try {
 				clazz = classLoader.loadClass( className ) ;
@@ -59,7 +61,7 @@ public class Util {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	protected final static <T> T getInstance(String className, Class<T> superClass ) {
+	public final static <T> T getInstance(String className, Class<T> superClass ) {
 		
 		if ( null == superClass ) {
 			throw new TinyMvcException("Super class is null" );

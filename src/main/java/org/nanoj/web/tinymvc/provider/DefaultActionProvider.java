@@ -1,4 +1,7 @@
-package org.nanoj.web.tinymvc ;
+package org.nanoj.web.tinymvc.provider ;
+
+import org.nanoj.web.tinymvc.Action;
+import org.nanoj.web.tinymvc.TinyMvcException;
 
 
 /**
@@ -65,7 +68,7 @@ public class DefaultActionProvider implements ActionProvider {
 		//--- Full class name 
 		String actionClassName = actionsPackage + new String(bytes) + "Action" ; // "my.package.DosomethingAction" 
 		
-		return Util.getInstance(actionClassName, Action.class) ;
+		return InstanceProvider.getInstance(actionClassName, Action.class) ;
 	}
 	
 }

@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.nanoj.util.beanmapper.BeanMapper;
+import org.nanoj.web.tinymvc.env.FieldValues;
+import org.nanoj.web.tinymvc.env.InputParameter;
 
 /**
  * Generic Action (abstract) implementation with few useful methods
@@ -20,12 +22,14 @@ public abstract class GenericAction implements Action {
 
 	private final static String VALUE = "fieldvalue" ;
 	
+	@Override
 	public void beforeAction(String method,  HttpServletRequest request, HttpServletResponse response) {
-		
+		// Default behavior : nothing to do 
 	}
 	
+	@Override
 	public void afterAction(String method,  HttpServletRequest request, HttpServletResponse response) {
-		
+		// Default behavior : nothing to do 
 	}
 	
 	//=========================================================================================
