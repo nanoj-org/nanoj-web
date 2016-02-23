@@ -25,7 +25,6 @@ public class ActionServlet extends HttpServlet {
 	
 	private static final String METHOD_PARAM_NAME  = "action.method" ;
 
-	
 	//--- Attributes
 	private ActionServletConfig  actionServletConfig = null ;
 	private ActionProcessor      actionProcessor     = null ;

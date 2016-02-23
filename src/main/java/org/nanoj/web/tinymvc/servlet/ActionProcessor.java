@@ -36,7 +36,7 @@ public class ActionProcessor {
 		
 		if ( actionProviderClassName != null ) {
 			//--- Get instance of the action provider class (defined in configuration)
-			this.actionProvider = InstanceProvider.getInstance(actionProviderClassName, ActionProvider.class) ;
+			this.actionProvider = InstanceProvider.createInstance(actionProviderClassName, ActionProvider.class) ;
 	    	trace("action provider initialized ( class = " + actionProviderClassName + " )");
 		}
 		else {

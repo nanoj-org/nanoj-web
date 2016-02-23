@@ -35,21 +35,24 @@ public class SpecificActionProvider implements ActionProvider {
 		}
 		
 		String actionName2 = actionName.trim().toLowerCase() ;
-		Class<? extends Action > c = map.get( actionName2 ) ;
-		if ( null == c ) {
-			throw new TinyMvcException("No action for '" + actionName2 + "'");
+		Class<? extends Action > actionClass = map.get( actionName2 ) ;
+		if ( null == actionClass ) {
+			throw new TinyMvcException("No action class for '" + actionName2 + "'");
 		}
 			
-		Action actionInstance;
-		try {
-			actionInstance = c.newInstance();
-		} catch (InstantiationException e) {
-			throw new TinyMvcException("Cannot instantiate " + c.getCanonicalName(), e );
-		} catch (IllegalAccessException e) {
-			throw new TinyMvcException("Cannot instantiate " + c.getCanonicalName(), e );
-		}
-		
-		return actionInstance ;
+//		Action actionInstance;
+//		try {
+//			actionInstance = actionClass.newInstance();
+//		} catch (InstantiationException e) {
+//			throw new TinyMvcException("Cannot instantiate " + actionClass.getCanonicalName(), e );
+//		} catch (IllegalAccessException e) {
+//			throw new TinyMvcException("Cannot instantiate " + actionClass.getCanonicalName(), e );
+//		}
+//		
+//		return actionInstance ;
+
+//		return InstanceProvider.createInstance(actionClass, Action.class) ;
+		return InstanceProvider.createInstance(actionClass) ;
 	}
 	
 }

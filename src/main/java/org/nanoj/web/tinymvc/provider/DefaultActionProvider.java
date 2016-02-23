@@ -68,7 +68,7 @@ public class DefaultActionProvider implements ActionProvider {
 		//--- Full class name 
 		String actionClassName = actionsPackage + new String(bytes) + "Action" ; // "my.package.DosomethingAction" 
 		
-		return InstanceProvider.getInstance(actionClassName, Action.class) ;
+		return InstanceProvider.createInstance(actionClassName, Action.class) ;
 	}
 	
 }

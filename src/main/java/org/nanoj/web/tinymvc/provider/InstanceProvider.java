@@ -1,5 +1,7 @@
 package org.nanoj.web.tinymvc.provider ;
 
+import org.nanoj.injector.Injector;
+import org.nanoj.injector.InjectorFactory;
 import org.nanoj.web.tinymvc.TinyMvcException;
 
 /**
@@ -9,6 +11,8 @@ import org.nanoj.web.tinymvc.TinyMvcException;
  *
  */
 public class InstanceProvider {
+
+	private final static Injector injector = InjectorFactory.createInjector("tiny-mvc-injector");
 
 	/**
 	 * Uses the current class loader to load the given class
@@ -33,35 +37,12 @@ public class InstanceProvider {
 	}
 	
 	/**
-	 * Creates an instance of the given class
-	 * @param clazz
-	 * @return
-	 */
-	private final static Object createInstance( Class<?> clazz ) {
-		if ( clazz != null ) { 
-			Object instance = null ;
-			try {
-				instance = clazz.newInstance();
-			} catch (InstantiationException e) {
-				throw new TinyMvcException("Cannot create " + clazz.getCanonicalName() + " instance (InstantiationException)", e );
-			} catch (IllegalAccessException e) {
-				throw new TinyMvcException("Cannot create " + clazz.getCanonicalName() + " instance (IllegalAccessException)", e );
-			}
-			return instance ;
-		}
-		else {
-			throw new TinyMvcException("Class is null" );
-		}
-	}
-	
-	/**
 	 * Creates an instance of the given class name and check it's a subclass of the given super class
 	 * @param className
 	 * @param superClass
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public final static <T> T getInstance(String className, Class<T> superClass ) {
+	public final static <T> T createInstance(String className, Class<T> superClass ) {
 		
 		if ( null == superClass ) {
 			throw new TinyMvcException("Super class is null" );
@@ -69,13 +50,51 @@ public class InstanceProvider {
 		
 		Class<?> clazz = loadClass(className) ;
 		
+		return createInstance(clazz, superClass );
+	}
+
+	/**
+	 * Creates an instance of the given class only if it's a subclass of the given super class
+	 * @param clazz
+	 * @param superClass
+	 * @return
+	 */
+	//@SuppressWarnings("unchecked")
+	public final static <T> T createInstance(Class<?> clazz, Class<T> superClass ) {
+		
 		if ( superClass.isAssignableFrom(clazz) ) {
-			Object instance = createInstance( clazz ) ;
-			return (T) instance ;
+			@SuppressWarnings("unchecked")
+			T instance = (T) createInstance( clazz ) ;
+			return instance ;
 		}
 		else {
-			throw new TinyMvcException("Class '" + className + "' doesn't extend/implement '" 
+			throw new TinyMvcException("Class '" + clazz.getCanonicalName() + "' doesn't extend/implement '" 
 				+ superClass.getCanonicalName() + "'" );
 		}
 	}
+
+	/**
+	 * Creates an instance of the given class
+	 * @param clazz
+	 * @return
+	 */
+	public final static <T> T createInstance( Class<T> clazz ) {
+//		if ( clazz != null ) { 
+//			T instance = null ;
+//			try {
+//				instance = clazz.newInstance();
+//			} catch (InstantiationException e) {
+//				throw new TinyMvcException("Cannot create " + clazz.getCanonicalName() + " instance (InstantiationException)", e );
+//			} catch (IllegalAccessException e) {
+//				throw new TinyMvcException("Cannot create " + clazz.getCanonicalName() + " instance (IllegalAccessException)", e );
+//			}
+//			return instance ;
+//		}
+//		else {
+//			throw new TinyMvcException("Class is null" );
+//		}
+		
+		return injector.getInstance(clazz);
+	}
+	
 }
