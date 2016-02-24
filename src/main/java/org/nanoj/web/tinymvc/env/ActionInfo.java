@@ -1,5 +1,7 @@
 package org.nanoj.web.tinymvc.env ;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Object containing information about the current action <br>
  * Stored in the request scope and usable in the JSP with 'E.L.' <br>
@@ -11,6 +13,8 @@ package org.nanoj.web.tinymvc.env ;
 public class ActionInfo {
 
 	private final String root ;
+
+	private final String httpServer ;
 	
 	private final String name ;
 	
@@ -22,21 +26,30 @@ public class ActionInfo {
 
 	private String viewPage = null ;
 
-	/**
-	 * Constructor
-	 * @param root
-	 * @param name
-	 * @param method
-	 */
-	public ActionInfo(String root, String name, String method) {
+//	/**
+//	 * Constructor
+//	 * @param root
+//	 * @param name
+//	 * @param method
+//	 */
+//	public ActionInfo(String root, String name, String method) {
+//		super();
+//		this.root = root;
+//		this.name = name;
+//		this.method = method;
+//	}
+	
+	public ActionInfo(HttpServletRequest request, String name, String method) {
 		super();
-		this.root = root;
+		this.root = request.getContextPath() + request.getServletPath() ;
+		this.httpServer = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() ;		
 		this.name = name;
 		this.method = method;
 	}
 
 	/**
-	 * Returns the current action root path in the current application context
+	 * Returns the current action root path in the current application context <br>
+	 * e.g. : '/mywebapp/actionservlet'
 	 * @return
 	 */
 	public String getRoot() {
@@ -44,13 +57,32 @@ public class ActionInfo {
 	}
 
 	/**
-	 * Returns the current action name that has been executed to produce the current result
+	 * Returns the current action name that has been executed to produce the current result <br>
+	 * e.g. : 'myaction'
 	 * @return
 	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Returns the current action relative URL <br>
+	 * e.g. : '/mywebapp/actionservlet/myaction'
+	 * @return
+	 */
+	public String getRelativeURL() {
+		return root + "/" + name ;
+	}
+
+	/**
+	 * Returns the current action absolute URL <br>
+	 * e.g. : 'http://myhost:8080/mywebapp/actionservlet/myaction'
+	 * @return
+	 */
+	public String getAbsoluteURL() {
+		return httpServer + root + "/" + name ;
+	}
+	
 	/**
 	 * Returns the current action method that has been executed to produce the current result
 	 * @return

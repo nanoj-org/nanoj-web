@@ -311,15 +311,20 @@ public abstract class GenericAction implements Action {
 	}
 	
 	//-------------------------------------------------------------------------------------------------------------
+	private boolean isNullOrVoid(String s ) {
+		if ( s == null ) return true ;
+		if ( s.trim().length() == 0 ) return true ;
+		return false ;
+	}
 	private Number getParamAsNumber(HttpServletRequest request, String paramName, Class<? extends Number> type, Number defaultValue ) {
 		
 		String paramValue = request.getParameter(paramName);
-		if ( null == paramValue ) {
+		if ( isNullOrVoid( paramValue ) ) {
 			if ( defaultValue != null ) {
 				return defaultValue ;
 			}
 			else {
-				throw new TinyMvcException("Param '" + paramName + "' required");
+				throw new TinyMvcException("Param '" + paramName + "' required (no default value)");
 			}
 		}
 		else {

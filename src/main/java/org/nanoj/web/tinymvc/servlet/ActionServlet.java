@@ -166,8 +166,9 @@ public class ActionServlet extends HttpServlet {
 
 		trace("process : action name = '" + actionName + "', method name = '" + methodName + "'");
 		
-		String actionRoot = request.getContextPath() + request.getServletPath() ;
-		return new ActionInfo(actionRoot, actionName, methodName );
+//		String actionRoot = request.getContextPath() + request.getServletPath() ;
+//		return new ActionInfo(actionRoot, actionName, methodName );
+		return new ActionInfo(request, actionName, methodName );
 			
     }
     
