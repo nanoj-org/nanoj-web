@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.nanoj.web.tinymvc.Action;
+import org.nanoj.web.tinymvc.Const;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 import org.nanoj.web.tinymvc.env.FieldValuesManager;
@@ -94,7 +95,10 @@ public class ActionProcessor {
 		//--- Get the action controller ( associated with the action name )
 		Action action = getAction( actionInfo ) ;
 
-		//--- Initialize the "fieldvalue" object stored as request attribute
+		//--- Initialize the "action.method" value 
+		request.setAttribute(Const.ACTION_METHOD_ATTRIBUTE_NAME, Const.ACTION_METHOD_PARAMETER_NAME);
+		
+		//--- Initialize the "fieldvalue" object stored as a request attribute
 		fieldValuesManager.setFieldValuesFromParameters(request);
 		
 		//--- Execute the action controller and get the view page 

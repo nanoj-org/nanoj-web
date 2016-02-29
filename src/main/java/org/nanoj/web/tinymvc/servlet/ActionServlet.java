@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.nanoj.web.tinymvc.Const;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 
@@ -37,8 +38,6 @@ public class ActionServlet extends HttpServlet {
 	//--- Constants
 	private static final long serialVersionUID = 1L;
 	
-	private static final String METHOD_PARAM_NAME  = "action.method" ;
-
 	//--- Attributes
 	private ActionServletConfig  actionServletConfig = null ;
 	private ActionProcessor      actionProcessor     = null ;
@@ -177,7 +176,7 @@ public class ActionServlet extends HttpServlet {
 		
 		if ( null == methodName ) {
 			//--- Try to find the method name in the request parameters ( e.g. for named submit buttons )
-			String s = request.getParameter( METHOD_PARAM_NAME );
+			String s = request.getParameter( Const.ACTION_METHOD_PARAMETER_NAME );
 			if ( s != null ) {
 				methodName = s.trim() ;
 			}
