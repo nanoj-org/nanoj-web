@@ -17,9 +17,11 @@ package org.nanoj.web.tinymvc.env ;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.nanoj.util.StrUtil;
+
 /**
  * Object containing information about the current action <br>
- * Stored in the request scope and usable in the JSP with 'E.L.' <br>
+ * Stored in the request scope and then usable in the JSP with 'E.L.' <br>
  * Keep this class public in order to be usable in JSP <br>
  *  
  * @author Laurent GUERIN
@@ -31,6 +33,8 @@ public class ActionInfo {
 
 	private final String httpServer ;
 	
+	private final String originalName ;
+
 	private final String name ;
 	
 	private final String method ;
@@ -41,30 +45,24 @@ public class ActionInfo {
 
 	private String viewPage = null ;
 
-//	/**
-//	 * Constructor
-//	 * @param root
-//	 * @param name
-//	 * @param method
-//	 */
-//	public ActionInfo(String root, String name, String method) {
-//		super();
-//		this.root = root;
-//		this.name = name;
-//		this.method = method;
-//	}
-	
-	public ActionInfo(HttpServletRequest request, String name, String method) {
+	/**
+	 * Constructor
+	 * @param request
+	 * @param originalName
+	 * @param method
+	 */
+	public ActionInfo(HttpServletRequest request, String originalName, String method) {
 		super();
 		this.root = request.getContextPath() + request.getServletPath() ;
 		this.httpServer = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() ;		
-		this.name = name;
+		this.originalName = originalName;
 		this.method = method;
+		this.name = StrUtil.firstCharLowerCase( originalName ) ;
 	}
 
 	/**
 	 * Returns the current action root path in the current application context <br>
-	 * e.g. : '/mywebapp/actionservlet'
+	 * e.g. : '/mywebapp/action'
 	 * @return
 	 */
 	public String getRoot() {
@@ -72,8 +70,17 @@ public class ActionInfo {
 	}
 
 	/**
-	 * Returns the current action name that has been executed to produce the current result <br>
-	 * e.g. : 'myaction'
+	 * Returns the current action original name (without modification) <br>
+	 * e.g. : 'myaction' or 'MyAction'
+	 * @return
+	 */
+	public String getOriginalName() {
+		return originalName;
+	}
+
+	/**
+	 * Returns the current action conventional name <br>
+	 * e.g. : 'compute' for 'Compute' or 'myAction' for 'MyAction'
 	 * @return
 	 */
 	public String getName() {
@@ -86,7 +93,7 @@ public class ActionInfo {
 	 * @return
 	 */
 	public String getRelativeURL() {
-		return root + "/" + name ;
+		return root + "/" + originalName ;
 	}
 
 	/**
@@ -95,7 +102,7 @@ public class ActionInfo {
 	 * @return
 	 */
 	public String getAbsoluteURL() {
-		return httpServer + root + "/" + name ;
+		return httpServer + root + "/" + originalName ;
 	}
 	
 	/**
@@ -106,7 +113,7 @@ public class ActionInfo {
 		return method;
 	}
 
-	
+	//---------------------------------------------------------------------------------
 	public void setClassName(String className) {
 		this.className = className;
 	}
@@ -115,32 +122,33 @@ public class ActionInfo {
 	}
 
 	
+	//---------------------------------------------------------------------------------
 	public String getViewTemplate() {
 		return viewTemplate;
 	}
-
 	public void setViewTemplate(String viewTemplate) {
 		this.viewTemplate = viewTemplate;
 	}
 
+	//---------------------------------------------------------------------------------
 	public String getViewPage() {
 		return viewPage;
 	}
-
 	public void setViewPage(String viewPage) {
 		this.viewPage = viewPage;
 	}
 
+	//---------------------------------------------------------------------------------
 	@Override
 	public String toString() {
 		return "[root=" + root 
 				+ ", name=" + name 
+				+ ", originalName=" + originalName 
 				+ ", method=" + method 
 				+ ", className=" + className 
 				+ ", viewTemplate=" + viewTemplate 
 				+ ", viewPage=" + viewPage 
 				+ "]";
 	}
-	
 	
 }

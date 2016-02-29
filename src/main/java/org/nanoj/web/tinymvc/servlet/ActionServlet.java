@@ -17,7 +17,6 @@ package org.nanoj.web.tinymvc.servlet ;
 
 import java.io.IOException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -43,10 +42,10 @@ public class ActionServlet extends HttpServlet {
 	//--- Attributes
 	private ActionServletConfig  actionServletConfig = null ;
 	private ActionProcessor      actionProcessor     = null ;
-	private ActionViewBuilder    actionViewBuilder   = null ;
+//	private ActionViewBuilder    actionViewBuilder   = null ;
+	private ActionViewRenderer   actionViewRenderer  = null ;
 	
-	private boolean traceFlag   = false ;
-	
+	private boolean traceFlag   = true ;
 	private void trace(String msg)
 	{
 		if ( traceFlag ) {
@@ -64,7 +63,9 @@ public class ActionServlet extends HttpServlet {
 		
 		//--- Collaborators creation
 		this.actionProcessor     = new ActionProcessor(actionServletConfig);
-		this.actionViewBuilder   = new ActionViewBuilder(actionServletConfig);
+//		this.actionViewBuilder   = new ActionViewBuilder(actionServletConfig);
+		
+		this.actionViewRenderer = new ActionViewRenderer(this.getServletContext(), actionServletConfig);
 
 		trace("Servlet " + this.getClass().getSimpleName() + " initialized :" );
 		trace(" . templates folder = '" + this.actionServletConfig.getTemplatesFolder() + "'" ) ;
@@ -100,6 +101,7 @@ public class ActionServlet extends HttpServlet {
     	
 		//--- 1) Get action information from the request URL
 		ActionInfo actionInfo = parseActionURI(request);
+		trace("--- ActionInfo : " + actionInfo );
 		
 		//--- 2) Execute the action controller
 		//String actionResult = executeAction(actionInfo, request, response);
@@ -114,16 +116,18 @@ public class ActionServlet extends HttpServlet {
 		}
 
 		//--- 3) Dispatch (forward) to VIEW ( with or without template )  
-		//String target = getForwardTarget( actionResult, actionInfo ) ;
-		String targetPage = actionViewBuilder.getTargetPage(actionResult, actionInfo);
+				
+//		//String target = getForwardTarget( actionResult, actionInfo ) ;
+//		String targetPage = actionViewBuilder.getTargetPage(actionResult, actionInfo);
+//		
+//		//--- Set action model in request scope
+//		request.setAttribute("action", actionInfo);
+//
+//		//--- Forward to target 
+//		RequestDispatcher requestDispatcher = this.getServletContext().getRequestDispatcher(targetPage) ;		
+//		requestDispatcher.forward(request, response);
 		
-		//--- Set action model in request scope
-		request.setAttribute("action", actionInfo);
-
-		//--- Forward to target 
-		RequestDispatcher requestDispatcher = this.getServletContext().getRequestDispatcher(targetPage) ;		
-		requestDispatcher.forward(request, response);
-		
+		actionViewRenderer.render(actionResult, actionInfo, request, response);
     }
     
     /**

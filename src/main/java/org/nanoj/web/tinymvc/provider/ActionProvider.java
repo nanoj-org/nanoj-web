@@ -28,7 +28,7 @@ public interface ActionProvider {
 	/**
 	 * Return the action instance for the given action name <br>
 	 * 
-	 * @param actionName
+	 * @param actionName the conventional action name (starting with a lower case)
 	 * @return
 	 */
 	Action getAction( String actionName) ;

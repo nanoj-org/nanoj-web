@@ -24,27 +24,34 @@ import javax.servlet.http.HttpServletResponse;
 import org.nanoj.web.tinymvc.Action;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
+import org.nanoj.web.tinymvc.env.FieldValuesManager;
 import org.nanoj.web.tinymvc.provider.ActionProvider;
 import org.nanoj.web.tinymvc.provider.DefaultActionProvider;
 import org.nanoj.web.tinymvc.provider.InstanceProvider;
 
 
 /**
- * Action processing called by the Servlet
+ * Action processing called by the Servlet ( SINGLE INSTANCE )
  * 
  * @author Laurent GUERIN
  */
 public class ActionProcessor {
 
-	//private final ActionServletConfig actionServletConfig ;
-	
 	private final ActionProvider      actionProvider  ;
+	private final FieldValuesManager  fieldValuesManager ;
 
+
+	private void trace(String msg) {
+		
+	}
+	
 	public ActionProcessor(ActionServletConfig actionServletConfig) {
 		super();
-		//this.actionServletConfig = actionServletConfig;
 		
-		//--- Init ActionProvider
+		//--- Initialize FieldValuesManager
+		fieldValuesManager = FieldValuesManager.getInstance() ;
+		
+		//--- Initialize ActionProvider
 		String actionProviderClassName = actionServletConfig.getActionProviderClassName() ;
 		String actionsPackage          = actionServletConfig.getActionsPackage();
 		String defaultAction           = actionServletConfig.getDefaultAction();
@@ -71,17 +78,8 @@ public class ActionProcessor {
 				throw new TinyMvcException("Cannot get action : no action provider class and no actions package " );
 			}
 		}
-		
 	}
 
-	private void trace(String msg)
-	{
-//		if ( traceFlag ) {
-//			String className = this.getClass().getSimpleName() ;
-//			System.out.println("[TRACE] " + className +  " : " + msg );
-//		}
-	}
-	
     /**
      * Executes the given action <br>
      * Invoke the standard method or the specific method specified in the URI 
@@ -94,16 +92,16 @@ public class ActionProcessor {
     		final HttpServletRequest request, final HttpServletResponse response )  {
     	
 		//--- Get the action controller ( associated with the action name )
-		Action action = getAction( actionInfo.getName() ) ;
-		
-		actionInfo.setClassName( action.getClass().getSimpleName() );
+		Action action = getAction( actionInfo ) ;
+
+		//--- Initialize the "fieldvalue" object stored as request attribute
+		fieldValuesManager.setFieldValuesFromParameters(request);
 		
 		//--- Execute the action controller and get the view page 
 		String actionResult = null ;
 		String actionMethodName = actionInfo.getMethod() ;
 		String method = ( actionMethodName != null ? actionMethodName : "process" ) ;
-		
-		
+
 		try {
 			//--- BEFORE ACTION CALL
 			action.beforeAction(method, request, response);
@@ -122,84 +120,33 @@ public class ActionProcessor {
 			//--- AFTER ACTION CALL
 			action.afterAction(method, request, response);
 		}
-		
 
     	trace ("action result = '" + actionResult + "'");
     	return actionResult ;
     }
-    
-	
-    
+
     /**
      * Returns the action implementation for the given action name
      * @param actionName
      * @return
      */
-    private Action getAction( final String actionName )  {
-    	trace("getAction('" + actionName + "')" );
+    private Action getAction( final ActionInfo actionInfo )  {
+    	
+    	trace("getAction('" + actionInfo.getName() + "')" );
+    	
 		if ( null == this.actionProvider ) {
-			//--- No yet initialized 
-//			if ( actionServletConfig.getActionProviderClassName() != null ) {
-//				//--- Get instance of the action provider class (defined in configuration)
-//				this.actionProvider = InstanceProvider.getInstance(actionServletConfig.getActionProviderClassName(), ActionProvider.class) ;
-//		    	trace("getAction : action provider initialized ( class = " + actionServletConfig.getActionProviderClassName() + " )");
-//			}
-//			else {
-//				//--- No action provider class defined => try to use "Convention over Configuration"
-//				if ( this.actionsPackage != null ) {
-//			    	trace("getAction : actions package = '" + this.actionsPackage + "'");
-//					if ( this.defaultAction != null ) {
-//				    	trace("getAction : default action = '" + this.defaultAction + "'");
-//					}
-//					else {
-//				    	trace("getAction : no default action ");
-//					}
-//					this.actionProvider = new DefaultActionProvider( this.actionsPackage, this.defaultAction ) ;
-//			    	trace("getAction : action provider initialized ( class = " + DefaultActionProvider.class.getCanonicalName() + " )");
-//				}
-//				else {
-//					throw new TinyMvcException("Cannot get action : no action provider class and no actions package " );
-//				}
-//			}
 			throw new TinyMvcException("Action provider is not initialized");
 		}
-
-		Action action = this.actionProvider.getAction(actionName) ;
+		
+		Action action = this.actionProvider.getAction( actionInfo.getName() ) ;
 		if ( null == action ) {
-			throw new TinyMvcException("Cannot get action '" + actionName + "' (not defined)" );
+			throw new TinyMvcException("Cannot get action '" + actionInfo.getName() + "' (not defined)" );
 		}
+		
+		actionInfo.setClassName( action.getClass().getSimpleName() );
+		
 		return action ;
     }
-    
-//    /**
-//     * Returns template full path
-//     * @param templateName
-//     * @return
-//     */
-//    private String getTemplateFullPath( final String templateName )  {
-//    	
-//    	if ( templateName.endsWith(this.pagesSuffix) ) {
-//    		return this.templatesFolder + templateName ;
-//    	}
-//    	else {
-//    		return this.templatesFolder + templateName + this.pagesSuffix ;
-//    	}
-//    }
-//    
-//    /**
-//     * Returns view page full path
-//     * @param pageName
-//     * @return
-//     */
-//    private String getPageFullPath( final String pageName )  {
-//    	
-//    	if ( pageName.endsWith(this.pagesSuffix) ) {
-//    		return this.pagesFolder + pageName ;
-//    	}
-//    	else {
-//    		return this.pagesFolder + pageName + this.pagesSuffix ;
-//    	}
-//    }
     
     /**
      * Execute a specific method using the reflection API
@@ -240,19 +187,13 @@ public class ActionProcessor {
 			//--- Try to re-throw the original exception if RunTime level
 			Throwable cause = e.getCause() ;
 			if ( cause != null ) {
-//				if ( cause instanceof RuntimeException ) {			
-//					throw (RuntimeException)cause ;
-//				}
-//				else {
-//					throw new ServletException(cause);
-//				}
-				throw new TinyMvcException(cause);
+				throw new TinyMvcException(invokeErrorMsg, cause);
 			}
 			else if ( e.getTargetException() != null ) {
-				throw new TinyMvcException( e.getTargetException() );
+				throw new TinyMvcException(invokeErrorMsg,  e.getTargetException() );
 			}
 			else {
-				throw new TinyMvcException(e);
+				throw new TinyMvcException(invokeErrorMsg, e);
 			}
 		}
     	

@@ -19,7 +19,7 @@ import javax.servlet.ServletConfig;
 
 
 /**
- * Action Servlet Configuration
+ * Action Servlet Configuration ( SINGLE INSTANCE )
  * 
  * @author Laurent Guerin
  */

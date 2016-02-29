@@ -18,13 +18,12 @@ package org.nanoj.web.tinymvc ;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.nanoj.util.beanmapper.BeanMapper;
-import org.nanoj.web.tinymvc.env.FieldValues;
+import org.nanoj.web.tinymvc.env.FieldValuesManager;
 import org.nanoj.web.tinymvc.env.InputParameter;
 
 /**
@@ -35,7 +34,7 @@ import org.nanoj.web.tinymvc.env.InputParameter;
  */
 public abstract class GenericAction implements Action {
 
-	private final static String VALUE = "fieldvalue" ;
+//	private final static String VALUE = "fieldvalue" ;
 	
 	@Override
 	public void beforeAction(String method,  HttpServletRequest request, HttpServletResponse response) {
@@ -103,28 +102,28 @@ public abstract class GenericAction implements Action {
 
 	//=========================================================================================
 	
-	/**
-	 * Returns a FieldValues objet located in the request scope (creates a new one if necessary)
-	 * @param request
-	 * @return
-	 */
-	@SuppressWarnings ( "unchecked" )
-	private FieldValues<String,String> getFieldValues(HttpServletRequest request ) {
-		FieldValues<String,String> fieldValues = null ;
-		//--- Try to found an existing list of field values in the request
-		Object o = null ;
-		if ( ( o = request.getAttribute(VALUE) ) != null ) {
-			if ( o instanceof FieldValues ) {				
-				fieldValues = (FieldValues<String,String>) o ;
-			}
-		}
-		//--- If not found : create a new one and put it in the request
-		if ( null == fieldValues ) {
-			fieldValues = new FieldValues<String,String>() ;
-			request.setAttribute(VALUE, fieldValues);
-		}
-		return fieldValues ;
-	}
+//	/**
+//	 * Returns a FieldValues objet located in the request scope (creates a new one if necessary)
+//	 * @param request
+//	 * @return
+//	 */
+//	@SuppressWarnings ( "unchecked" )
+//	private FieldValues<String,String> getFieldValues(HttpServletRequest request ) {
+//		FieldValues<String,String> fieldValues = null ;
+//		//--- Try to found an existing list of field values in the request
+//		Object o = null ;
+//		if ( ( o = request.getAttribute(VALUE) ) != null ) {
+//			if ( o instanceof FieldValues ) {				
+//				fieldValues = (FieldValues<String,String>) o ;
+//			}
+//		}
+//		//--- If not found : create a new one and put it in the request
+//		if ( null == fieldValues ) {
+//			fieldValues = new FieldValues<String,String>() ;
+//			request.setAttribute(VALUE, fieldValues);
+//		}
+//		return fieldValues ;
+//	}
 	
 	/**
 	 * Set a specific field value in the "fieldvalue" object (in the request scope)
@@ -134,48 +133,49 @@ public abstract class GenericAction implements Action {
 	 * @param fieldValue
 	 */
 	protected void setFieldValue(HttpServletRequest request, String fieldName, String fieldValue ) {
-		FieldValues<String,String> fieldValues = getFieldValues(request);
-		fieldValues.setFieldValue(fieldName, fieldValue);
+//		FieldValues<String,String> fieldValues = getFieldValues(request);
+//		fieldValues.setFieldValue(fieldName, fieldValue);
+		FieldValuesManager.getInstance().setFieldValue(request, fieldName, fieldValue);
 	}
 
-	/**
-	 * Set a parameter value in the corresponding field value in the "fieldvalue" object (in the request scope)<br>
-	 * Try to get the value of a request parameter with the same name as the given field name and set it.<br>
-	 * If the parameter is not found a "blank" value is set.
-	 * 
-	 * @param request
-	 * @param fieldName
-	 */
-	protected void setFieldValueFromParam(HttpServletRequest request, String fieldName) {
-		FieldValues<String,String> fieldValues = getFieldValues(request);
-		String paramValue = request.getParameter(fieldName);
-		if ( null == paramValue ) {
-			paramValue = "" ;
-		}
-		fieldValues.setFieldValue(fieldName, paramValue);
-	}
+//	/**
+//	 * Set a parameter value in the corresponding field value in the "fieldvalue" object (in the request scope)<br>
+//	 * Try to get the value of a request parameter with the same name as the given field name and set it.<br>
+//	 * If the parameter is not found a "blank" value is set.
+//	 * 
+//	 * @param request
+//	 * @param fieldName
+//	 */
+//	protected void setFieldValueFromParam(HttpServletRequest request, String fieldName) {
+//		FieldValues<String,String> fieldValues = getFieldValues(request);
+//		String paramValue = request.getParameter(fieldName);
+//		if ( null == paramValue ) {
+//			paramValue = "" ;
+//		}
+//		fieldValues.setFieldValue(fieldName, paramValue);
+//	}
 	
-	/**
-	 * Set all the request parameters in the "fieldvalue" object (in the request scope) <br>
-	 * 
-	 * @param request
-	 */
-	protected void setFieldValuesFromParameters(HttpServletRequest request) {
-		FieldValues<String,String> fieldValues = getFieldValues(request);
-
-		Map<String,String[]> parameters = request.getParameterMap() ;
-		Set<String> paramNames = parameters.keySet() ;
-		for ( String paramName : paramNames ) {
-			String[] v = parameters.get(paramName);
-			if ( v != null ) {
-				String paramValue = v[0] ;
-				if ( null == paramValue ) {
-					paramValue = "" ;
-				}
-				fieldValues.setFieldValue(paramName, paramValue);
-			}
-		}
-	}
+//	/**
+//	 * Set all the request parameters in the "fieldvalue" object (in the request scope) <br>
+//	 * 
+//	 * @param request
+//	 */
+//	protected void setFieldValuesFromParameters(HttpServletRequest request) {
+//		FieldValues<String,String> fieldValues = getFieldValues(request);
+//
+//		Map<String,String[]> parameters = request.getParameterMap() ;
+//		Set<String> paramNames = parameters.keySet() ;
+//		for ( String paramName : paramNames ) {
+//			String[] v = parameters.get(paramName);
+//			if ( v != null ) {
+//				String paramValue = v[0] ;
+//				if ( null == paramValue ) {
+//					paramValue = "" ;
+//				}
+//				fieldValues.setFieldValue(paramName, paramValue);
+//			}
+//		}
+//	}
 	
 	//-------------------------------------------------------------------------------------------------------------
 	// Param as String

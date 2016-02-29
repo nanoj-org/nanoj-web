@@ -15,6 +15,7 @@
  */
 package org.nanoj.web.tinymvc.provider ;
 
+import org.nanoj.util.StrUtil;
 import org.nanoj.web.tinymvc.Action;
 import org.nanoj.web.tinymvc.TinyMvcException;
 
@@ -28,60 +29,62 @@ import org.nanoj.web.tinymvc.TinyMvcException;
  */
 public class DefaultActionProvider implements ActionProvider {
 
-	private final String actionsPackage ;
+	private final String actionsPackageWithEndingPoint ;
 
-	private final String defaultAction ;
+	private final String defaultActionName ;
 		
 	/**
 	 * Constructor <br>
 	 * 
-	 * @param actionsPackage
-	 * @param defaultAction
+	 * @param actionsPackage  the actions package name 
+	 * @param defaultAction   the default action name 
 	 */
 	public DefaultActionProvider(String actionsPackage, String defaultAction) {
 		super();
+		
+		//--- Build the actions package name 
 		if ( null == actionsPackage ) {
 			throw new TinyMvcException("Cannot create DefaultActionProvider : actions package is null");
 		}
 		if ( actionsPackage.endsWith(".") ) {
-			this.actionsPackage = actionsPackage ;
+			this.actionsPackageWithEndingPoint = actionsPackage ;
 		}
 		else {
-			this.actionsPackage = actionsPackage + "." ;
+			this.actionsPackageWithEndingPoint = actionsPackage + "." ;
 		}
-		this.defaultAction  = defaultAction ; // Can be null 
+
+		//--- Set the default action 
+		this.defaultActionName  = defaultAction ; // Can be null 
 	} 
 
 
-	/* (non-Javadoc)
-	 * @see org.telosys.web.tinymvc.ActionProvider#getAction(java.lang.String)
-	 */
+	@Override
 	public final Action getAction(String actionName ) {
 		
 		if ( null == actionName ) {
 			throw new TinyMvcException("Action name is null" );
 		}
 		
-		String actionName2 = actionName.trim().toLowerCase() ;
-		if ( actionName2.length() == 0 ) {
-			if ( this.defaultAction != null ) {
-				actionName2 = this.defaultAction ;
+//		String actionName2 = actionName.trim().toLowerCase() ;
+		if ( actionName.length() == 0 ) {
+			if ( this.defaultActionName != null ) {
+				actionName = this.defaultActionName ;
 			}
 			else {
 				throw new TinyMvcException("No action name and no default action" );
 			}
 		}
 		
-		//--- First char to UpperCase
-		byte[] bytes = actionName2.getBytes();
-		byte firstChar = bytes[0] ;
-		if ( firstChar >= 'a' && firstChar <= 'z' ) {
-			byte delta = 'a' - 'A' ;
-			bytes[0] = (byte) (firstChar - delta) ;
-		}
+//		//--- First char to UpperCase
+//		byte[] bytes = actionName.getBytes();
+//		byte firstChar = bytes[0] ;
+//		if ( firstChar >= 'a' && firstChar <= 'z' ) {
+//			byte delta = 'a' - 'A' ;
+//			bytes[0] = (byte) (firstChar - delta) ;
+//		}
 
-		//--- Full class name 
-		String actionClassName = actionsPackage + new String(bytes) + "Action" ; // "my.package.DosomethingAction" 
+		//--- Full class name ( e.g. "org.demo.actions.DoSomethingAction" ) 
+		String actionClassName = actionsPackageWithEndingPoint + StrUtil.firstCharUpperCase(actionName) + "Action" ; 
 		
 		return InstanceProvider.createInstance(actionClassName, Action.class) ;
 	}

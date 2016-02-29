@@ -53,12 +53,6 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>nanoj</groupId>
-			<artifactId>nanoj-commons</artifactId>
-			<version>0.8.1-SNAPSHOT</version>
-		</dependency>
  
 		<dependency>
 			<groupId>nanoj</groupId>

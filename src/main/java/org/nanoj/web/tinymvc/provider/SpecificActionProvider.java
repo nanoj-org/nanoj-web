@@ -21,17 +21,27 @@ import org.nanoj.web.tinymvc.Action;
 import org.nanoj.web.tinymvc.TinyMvcException;
 
 /**
- * Standard provider for actions <br>
- * Can be used directly by the application as the ActionProvider implementation
+ * Specific action provider based on a 'Map' : <br>
+ * Just get the action class from the map using the given action name as the key <br>
+ * . key   : action name <br>
+ * . value : action implementation <br>
+ * <br>
+ * This action provider implementation can be used directly by the application <br>
  * 
  * @author Laurent Guerin
  *
  */
 public class SpecificActionProvider implements ActionProvider {
 
-	private final Map<String, Class<? extends Action > > map ;
-	
-	
+	/**
+	 * 
+	 */
+	private final Map<String, Class<? extends Action> > map ;
+
+	/**
+	 * Constructor
+	 * @param map
+	 */
 	public SpecificActionProvider( Map<String, Class<? extends Action>> map) {
 		super();
 		if ( map != null ) {
@@ -43,16 +53,17 @@ public class SpecificActionProvider implements ActionProvider {
 	}
 
 
-	public final Action getAction(String actionName ) {
+	@Override
+	public final Action getAction(String actionConventionalName ) {
 		
-		if ( null == actionName ) {
+		if ( null == actionConventionalName ) {
 			throw new TinyMvcException("Action name is null" );
 		}
 		
-		String actionName2 = actionName.trim().toLowerCase() ;
-		Class<? extends Action > actionClass = map.get( actionName2 ) ;
+//		String actionName2 = actionName.trim().toLowerCase() ;
+		Class<? extends Action > actionClass = map.get( actionConventionalName ) ;
 		if ( null == actionClass ) {
-			throw new TinyMvcException("No action class for '" + actionName2 + "'");
+			throw new TinyMvcException("No action class for '" + actionConventionalName + "'");
 		}
 			
 //		Action actionInstance;
