@@ -23,6 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.nanoj.util.StrUtil;
+import org.nanoj.web.tinymvc.Configuration;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 
@@ -35,18 +37,23 @@ import org.nanoj.web.tinymvc.env.ActionInfo;
 public class ActionViewRenderer {
 	
 	//--- Attributes
-	private final ServletContext     servletContext ;
+//	private final ServletContext     servletContext ;
 	private final ActionViewBuilder  actionViewBuilder ;
 
-    public ActionViewRenderer( ServletContext servletContext, ActionServletConfig actionServletConfig ) {
+//    public ActionViewRenderer( ServletContext servletContext, Configuration actionServletConfig ) {
+	public ActionViewRenderer( Configuration actionServletConfig ) {
 		super();
 		this.actionViewBuilder = new ActionViewBuilder(actionServletConfig);
-		this.servletContext = servletContext ;
+//		this.servletContext = servletContext ;
 	}
 
-    protected void render( final String actionResult, final ActionInfo actionInfo, 
+    public void render( final String actionResult, final ActionInfo actionInfo, 
     		final HttpServletRequest request, final HttpServletResponse response) {
 		String targetPage = actionViewBuilder.getTargetPage(actionResult, actionInfo);
+		
+		if ( StrUtil.nullOrVoid(targetPage) ) {
+			throw new TinyMvcException("No target page for action '" + actionInfo.getName() + "'");
+		}
 		
 		//--- Set action model in request scope
 		request.setAttribute("action", actionInfo);
@@ -56,8 +63,10 @@ public class ActionViewRenderer {
 
     private void renderJSP( final String targetPage,
     		final HttpServletRequest request, final HttpServletResponse response) {
+    	
+    	ServletContext servletContext = request.getServletContext();
 		//--- Forward to target 
-		RequestDispatcher requestDispatcher = this.servletContext.getRequestDispatcher(targetPage) ;
+		RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(targetPage) ;
 		
 		try {
 			requestDispatcher.forward(request, response);

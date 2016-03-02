@@ -15,30 +15,31 @@
  */
 package org.nanoj.web.tinymvc.servlet ;
 
+import org.nanoj.web.tinymvc.Configuration;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 
 
 /**
- * TINY MVC Action Renderer
+ * TINY MVC View Builder
  * 
  * @author Laurent Guerin
  */
 public class ActionViewBuilder {
 	
 	//--- Attributes
-	private final String pagesFolder ; 
+	private final String viewsFolder ; 
 
 	private final String pagesSuffix ; 
 	
-	private final String templatesFolder ; 
+	private final String layoutsFolder ; 
 
 
-    public ActionViewBuilder( ActionServletConfig actionServletConfig ) {
+    public ActionViewBuilder( Configuration actionServletConfig ) {
 		super();
-		this.pagesFolder = actionServletConfig.getPagesFolder();
-		this.pagesSuffix = actionServletConfig.getPagesSuffix();
-		this.templatesFolder = actionServletConfig.getTemplatesFolder();
+		this.viewsFolder = actionServletConfig.getViewsFolder();
+		this.pagesSuffix = actionServletConfig.getViewsSuffix();
+		this.layoutsFolder = actionServletConfig.getLayoutsFolder();
 	}
 
 	/**
@@ -48,13 +49,13 @@ public class ActionViewBuilder {
      * @return
      */
     protected String getTargetPage( final String actionResult, final ActionInfo actionInfo ) {
-    	String target = null ;
-    	String viewTemplate = null ;
+    	//String target = null ;
+    	String viewLayout = null ;
     	String viewPage     = null ;
     	if ( actionResult.indexOf('<') >= 0 ) {
     		String [] parts = actionResult.split("<");
     		if ( parts.length == 2 ) {
-    			viewTemplate = parts[0].trim() ;
+    			viewLayout = parts[0].trim() ;
     			viewPage     = parts[1].trim() ;
     		}
     		else {
@@ -62,7 +63,7 @@ public class ActionViewBuilder {
     		}
     	}
     	else {
-        	viewTemplate = null ;
+        	viewLayout = null ;
         	viewPage     = actionResult.trim() ;
     	}
     	
@@ -71,18 +72,17 @@ public class ActionViewBuilder {
 
     	actionInfo.setViewPage( getPageFullPath(viewPage) );
     	
-    	if ( null != viewTemplate ) {
-    		actionInfo.setViewTemplate( getTemplateFullPath(viewTemplate) );
-    		target = actionInfo.getViewTemplate() ;
+    	if ( null != viewLayout ) {
+    		actionInfo.setViewLayout( getLayoutFullPath(viewLayout) );
+    		return actionInfo.getViewLayout() ;
     	}
     	else {
-    		actionInfo.setViewTemplate( null );
-    		target = actionInfo.getViewPage();
+    		actionInfo.setViewLayout( null );
+    		return actionInfo.getViewPage();
     	}
     	
 //		trace(" view target = '" + target + "' ");
-    	return target ;
-    	
+//    	return target ;
     }
 
     /**
@@ -93,10 +93,10 @@ public class ActionViewBuilder {
     private String getPageFullPath( final String pageName )  {
     	
     	if ( pageName.endsWith(this.pagesSuffix) ) {
-    		return this.pagesFolder + pageName ;
+    		return this.viewsFolder + pageName ;
     	}
     	else {
-    		return this.pagesFolder + pageName + this.pagesSuffix ;
+    		return this.viewsFolder + pageName + this.pagesSuffix ;
     	}
     	
 //    	if ( pageName.endsWith( actionServletConfig.getPagesSuffix() ) ) {
@@ -112,13 +112,13 @@ public class ActionViewBuilder {
      * @param templateName
      * @return
      */
-    private String getTemplateFullPath( final String templateName )  {
+    private String getLayoutFullPath( final String templateName )  {
     	
     	if ( templateName.endsWith(this.pagesSuffix) ) {
-    		return this.templatesFolder + templateName ;
+    		return this.layoutsFolder + templateName ;
     	}
     	else {
-    		return this.templatesFolder + templateName + this.pagesSuffix ;
+    		return this.layoutsFolder + templateName + this.pagesSuffix ;
     	}
     	
 //    	if ( templateName.endsWith( actionServletConfig.getPagesSuffix() ) ) {

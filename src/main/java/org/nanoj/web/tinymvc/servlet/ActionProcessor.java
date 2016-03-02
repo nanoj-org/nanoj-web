@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.nanoj.web.tinymvc.Action;
+import org.nanoj.web.tinymvc.Configuration;
 import org.nanoj.web.tinymvc.Const;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
@@ -46,14 +47,14 @@ public class ActionProcessor {
 		
 	}
 	
-	public ActionProcessor(ActionServletConfig actionServletConfig) {
+	public ActionProcessor(Configuration actionServletConfig) {
 		super();
 		
 		//--- Initialize FieldValuesManager
 		fieldValuesManager = FieldValuesManager.getInstance() ;
 		
 		//--- Initialize ActionProvider
-		String actionProviderClassName = actionServletConfig.getActionProviderClassName() ;
+		String actionProviderClassName = actionServletConfig.getActionsProviderClassName() ;
 		String actionsPackage          = actionServletConfig.getActionsPackage();
 		String defaultAction           = actionServletConfig.getDefaultAction();
 		
@@ -89,7 +90,7 @@ public class ActionProcessor {
      * @param response
      * @return
      */
-    protected String executeAction(final ActionInfo actionInfo, 
+    public String executeAction(final ActionInfo actionInfo, 
     		final HttpServletRequest request, final HttpServletResponse response )  {
     	
 		//--- Get the action controller ( associated with the action name )

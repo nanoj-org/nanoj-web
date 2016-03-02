@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.nanoj.web.tinymvc.Configuration;
+import org.nanoj.web.tinymvc.ConfigurationLoader;
 import org.nanoj.web.tinymvc.Const;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
@@ -39,7 +41,10 @@ public class ActionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	//--- Attributes
-	private ActionServletConfig  actionServletConfig = null ;
+//	private ActionServletConfig  actionServletConfig = null ;
+	private Configuration        actionServletConfig = null ;
+	private ActionParser         actionParser        = new ActionParser() ;
+
 	private ActionProcessor      actionProcessor     = null ;
 //	private ActionViewBuilder    actionViewBuilder   = null ;
 	private ActionViewRenderer   actionViewRenderer  = null ;
@@ -58,21 +63,25 @@ public class ActionServlet extends HttpServlet {
 		super.init(config);
 		
 		//--- Configuration creation
-		this.actionServletConfig = new ActionServletConfig(config);
+//		this.actionServletConfig = new ActionServletConfig(config);
+//		this.actionServletConfig = new Configuration(config);
+		ConfigurationLoader configurationLoader = new ConfigurationLoader() ;
+		this.actionServletConfig = configurationLoader.loadConfiguration();
 		
 		//--- Collaborators creation
 		this.actionProcessor     = new ActionProcessor(actionServletConfig);
 //		this.actionViewBuilder   = new ActionViewBuilder(actionServletConfig);
 		
-		this.actionViewRenderer = new ActionViewRenderer(this.getServletContext(), actionServletConfig);
+//		this.actionViewRenderer = new ActionViewRenderer(this.getServletContext(), actionServletConfig);
+		this.actionViewRenderer = new ActionViewRenderer(actionServletConfig);
 
 		trace("Servlet " + this.getClass().getSimpleName() + " initialized :" );
-		trace(" . templates folder = '" + this.actionServletConfig.getTemplatesFolder() + "'" ) ;
-		trace(" . pages folder     = '" + this.actionServletConfig.getPagesFolder() + "'" ) ;
-		trace(" . pages suffix     = '" + this.actionServletConfig.getPagesSuffix() + "'" ) ;
-		trace(" . action provider class = '" + this.actionServletConfig.getActionProviderClassName() + "'" ) ;
-		trace(" . actions package       = '" + this.actionServletConfig.getActionsPackage() + "'" ) ;
-		trace(" . default action        = '" + this.actionServletConfig.getDefaultAction() + "'" ) ;
+		trace(" . layouts folder   = '" + this.actionServletConfig.getLayoutsFolder() + "'" ) ;
+		trace(" . views folder     = '" + this.actionServletConfig.getViewsFolder() + "'" ) ;
+		trace(" . views suffix     = '" + this.actionServletConfig.getViewsSuffix() + "'" ) ;
+		trace(" . actions provider class = '" + this.actionServletConfig.getActionsProviderClassName() + "'" ) ;
+		trace(" . actions package        = '" + this.actionServletConfig.getActionsPackage() + "'" ) ;
+		trace(" . default action         = '" + this.actionServletConfig.getDefaultAction() + "'" ) ;
 	}
 
 
@@ -99,17 +108,16 @@ public class ActionServlet extends HttpServlet {
     private void process(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
     	
 		//--- 1) Get action information from the request URL
-		ActionInfo actionInfo = parseActionURI(request);
+//		ActionInfo actionInfo = parseActionURI(request);
+		ActionInfo actionInfo = actionParser.parseActionURI(request);
 		trace("--- ActionInfo : " + actionInfo );
 		
 		//--- 2) Execute the action controller
-		//String actionResult = executeAction(actionInfo, request, response);
 		String actionResult = actionProcessor.executeAction(actionInfo, request, response);
 		
-		if ( null == actionResult ) {
+		if ( actionResult == null ) {
 			throw new TinyMvcException("Action result is null (action " + actionInfo.getClassName() + ")" );
 		}
-
 		if ( actionResult.trim().length() == 0 ) {
 			throw new TinyMvcException("Action result is void (action " + actionInfo.getClassName() + ")" );
 		}
@@ -129,66 +137,66 @@ public class ActionServlet extends HttpServlet {
 		actionViewRenderer.render(actionResult, actionInfo, request, response);
     }
     
-    /**
-     * Parse the URI in order to obtain action information
-     * @param request
-     * @return
-     */
-    private ActionInfo parseActionURI( final HttpServletRequest request )  {
-		String path = request.getPathInfo();
-
-		trace("process : path = '" + path + "'" );
-		
-		if ( null == path || "".equals(path) || "/".equals(path) )
-		{
-			path="/" ; 
-		}
-		
-		String actionString = path.substring(1); //  "/myaction" --> "myaction"
-
-		String actionName = null;
-		String methodName = null; // specific method (if any)
-		
-		//--- Get action name and method name from "PathInfo"
-		if ( actionString.length() > 0 ) {
-			
-			int pointPosition = actionString.indexOf('.') ;
-			if ( pointPosition == 0 ) {
-				throw new TinyMvcException("Invalid action name (starts with '.')" );
-			}
-			else if ( pointPosition == actionString.length()-1 ) {
-				throw new TinyMvcException("Invalid action name (ends with '.')" );
-			}
-			else if ( pointPosition > 0 ) {
-				actionName = actionString.substring(0, pointPosition) ; // left part
-				methodName = actionString.substring(pointPosition+1, actionString.length()); // right part
-			}
-			else {
-				// If < 0 : No point (keep the name as is, no method )
-				actionName = actionString ;
-				methodName = null ; // no specific method
-			}
-		}
-		else {
-			actionName = "" ; // void action name
-			methodName = null ; // no specific method
-		}
-		
-		if ( null == methodName ) {
-			//--- Try to find the method name in the request parameters ( e.g. for named submit buttons )
-			String s = request.getParameter( Const.ACTION_METHOD_PARAMETER_NAME );
-			if ( s != null ) {
-				methodName = s.trim() ;
-			}
-		}
-
-		trace("process : action name = '" + actionName + "', method name = '" + methodName + "'");
-		
-//		String actionRoot = request.getContextPath() + request.getServletPath() ;
-//		return new ActionInfo(actionRoot, actionName, methodName );
-		return new ActionInfo(request, actionName, methodName );
-			
-    }
+//    /**
+//     * Parse the URI in order to obtain action information
+//     * @param request
+//     * @return
+//     */
+//    private ActionInfo parseActionURI( final HttpServletRequest request )  {
+//		String path = request.getPathInfo();
+//
+//		trace("process : path = '" + path + "'" );
+//		
+//		if ( null == path || "".equals(path) || "/".equals(path) )
+//		{
+//			path="/" ; 
+//		}
+//		
+//		String actionString = path.substring(1); //  "/myaction" --> "myaction"
+//
+//		String actionName = null;
+//		String methodName = null; // specific method (if any)
+//		
+//		//--- Get action name and method name from "PathInfo"
+//		if ( actionString.length() > 0 ) {
+//			
+//			int pointPosition = actionString.indexOf('.') ;
+//			if ( pointPosition == 0 ) {
+//				throw new TinyMvcException("Invalid action name (starts with '.')" );
+//			}
+//			else if ( pointPosition == actionString.length()-1 ) {
+//				throw new TinyMvcException("Invalid action name (ends with '.')" );
+//			}
+//			else if ( pointPosition > 0 ) {
+//				actionName = actionString.substring(0, pointPosition) ; // left part
+//				methodName = actionString.substring(pointPosition+1, actionString.length()); // right part
+//			}
+//			else {
+//				// If < 0 : No point (keep the name as is, no method )
+//				actionName = actionString ;
+//				methodName = null ; // no specific method
+//			}
+//		}
+//		else {
+//			actionName = "" ; // void action name
+//			methodName = null ; // no specific method
+//		}
+//		
+//		if ( null == methodName ) {
+//			//--- Try to find the method name in the request parameters ( e.g. for named submit buttons )
+//			String s = request.getParameter( Const.ACTION_METHOD_PARAMETER_NAME );
+//			if ( s != null ) {
+//				methodName = s.trim() ;
+//			}
+//		}
+//
+//		trace("process : action name = '" + actionName + "', method name = '" + methodName + "'");
+//		
+////		String actionRoot = request.getContextPath() + request.getServletPath() ;
+////		return new ActionInfo(actionRoot, actionName, methodName );
+//		return new ActionInfo(request, actionName, methodName );
+//			
+//    }
     
 //    /**
 //     * Returns template full path

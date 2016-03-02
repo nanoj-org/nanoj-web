@@ -29,9 +29,9 @@ import org.nanoj.util.StrUtil;
  */
 public class ActionInfo {
 
-	private final String root ;
+	private final String requestURL ;
 
-	private final String httpServer ;
+	private final String requestURI ;
 	
 	private final String originalName ;
 
@@ -41,7 +41,7 @@ public class ActionInfo {
 
 	private String className = "?" ;
 
-	private String viewTemplate = null ;
+	private String viewLayout = null ;
 
 	private String viewPage = null ;
 
@@ -53,20 +53,38 @@ public class ActionInfo {
 	 */
 	public ActionInfo(HttpServletRequest request, String originalName, String method) {
 		super();
-		this.root = request.getContextPath() + request.getServletPath() ;
-		this.httpServer = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() ;		
+		this.requestURL = removeEndingMethodName(request.getRequestURL().toString(), method);
+		this.requestURI = removeEndingMethodName(request.getRequestURI(), method);		
 		this.originalName = originalName;
-		this.method = method;
 		this.name = StrUtil.firstCharLowerCase( originalName ) ;
+		this.method = method;
+	}
+
+	private String removeEndingMethodName(String s, String method) {
+		if ( ! StrUtil.nullOrVoid(method) ) {
+			return StrUtil.removeEnd(s, "." + method );
+		}
+		return s ;
 	}
 
 	/**
-	 * Returns the current action root path in the current application context <br>
-	 * e.g. : '/mywebapp/action'
+	 * Returns the current action request URL <br>
+	 * same as HttpServletRequest.getRequestURL() <br>
+	 * e.g. : 'http://myhost:8080/mywebapp/aaa/bbb/myaction'
 	 * @return
 	 */
-	public String getRoot() {
-		return root;
+	public String getRequestURL() {
+		return requestURL;
+	}
+
+	/**
+	 * Returns the current action request URI <br>
+	 * same as HttpServletRequest.getRequestURI() <br>
+	 * e.g. : '/mywebapp/aaa/bbb/myaction'
+	 * @return
+	 */
+	public String getRequestURI() {
+		return requestURI;
 	}
 
 	/**
@@ -88,24 +106,6 @@ public class ActionInfo {
 	}
 
 	/**
-	 * Returns the current action relative URL <br>
-	 * e.g. : '/mywebapp/actionservlet/myaction'
-	 * @return
-	 */
-	public String getRelativeURL() {
-		return root + "/" + originalName ;
-	}
-
-	/**
-	 * Returns the current action absolute URL <br>
-	 * e.g. : 'http://myhost:8080/mywebapp/actionservlet/myaction'
-	 * @return
-	 */
-	public String getAbsoluteURL() {
-		return httpServer + root + "/" + originalName ;
-	}
-	
-	/**
 	 * Returns the current action method that has been executed to produce the current result
 	 * @return
 	 */
@@ -123,11 +123,11 @@ public class ActionInfo {
 
 	
 	//---------------------------------------------------------------------------------
-	public String getViewTemplate() {
-		return viewTemplate;
+	public String getViewLayout() {
+		return viewLayout;
 	}
-	public void setViewTemplate(String viewTemplate) {
-		this.viewTemplate = viewTemplate;
+	public void setViewLayout(String viewLayout) {
+		this.viewLayout = viewLayout;
 	}
 
 	//---------------------------------------------------------------------------------
@@ -141,12 +141,11 @@ public class ActionInfo {
 	//---------------------------------------------------------------------------------
 	@Override
 	public String toString() {
-		return "[root=" + root 
-				+ ", name=" + name 
+		return "[  name=" + name 
 				+ ", originalName=" + originalName 
 				+ ", method=" + method 
 				+ ", className=" + className 
-				+ ", viewTemplate=" + viewTemplate 
+				+ ", viewLayout=" + viewLayout 
 				+ ", viewPage=" + viewPage 
 				+ "]";
 	}
