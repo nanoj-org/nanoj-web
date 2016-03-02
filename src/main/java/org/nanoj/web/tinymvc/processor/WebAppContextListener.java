@@ -15,8 +15,12 @@
  */
 package org.nanoj.web.tinymvc.processor;
 
+import java.util.logging.Level;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
+import org.nanoj.util.ConsoleLoggerProvider;
 
 // Unused
 // @WebListener
@@ -25,6 +29,7 @@ public class WebAppContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         System.out.println("Web application started");
+        ConsoleLoggerProvider.setGlobalLevelThreshold(Level.OFF);
     }
      
     @Override

@@ -31,13 +31,12 @@ import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.config.ConfigurationLoader;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 
-@WebFilter(urlPatterns = {"/*"} )
+@WebFilter( filterName="zzz-nanoj", urlPatterns = {"/*"} )
+//@WebFilter( filterName="aaa-nanoj", urlPatterns = {"/*"} )
 public class ActionFilter implements Filter  {
 	
 	private final Configuration      configuration ;
 	private final ActionProcessor    actionProcessor ;
-//	private final ActionViewRenderer actionViewRenderer ;
-	
 	
 	private boolean traceFlag   = true ;
 	private void trace(String msg) {
@@ -56,7 +55,6 @@ public class ActionFilter implements Filter  {
 		ConfigurationLoader configurationLoader = new ConfigurationLoader() ;
 		this.configuration = configurationLoader.loadConfiguration();
 		this.actionProcessor    = new ActionProcessor(configuration);
-//		this.actionViewRenderer = new ActionViewRenderer(configuration);
 	}
 
 	@Override
