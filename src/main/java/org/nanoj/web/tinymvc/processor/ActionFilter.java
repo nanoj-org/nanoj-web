@@ -23,61 +23,55 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.nanoj.web.tinymvc.config.Configuration;
-import org.nanoj.web.tinymvc.config.ConfigurationLoader;
 import org.nanoj.web.tinymvc.env.ActionInfo;
+import org.nanoj.web.tinymvc.util.ConsoleLogger;
 
-@WebFilter( filterName="zzz-nanoj", urlPatterns = {"/*"} )
+//@WebFilter( filterName="zzz-nanoj", urlPatterns = {"/*"} )
 //@WebFilter( filterName="aaa-nanoj", urlPatterns = {"/*"} )
 public class ActionFilter implements Filter  {
 	
 	private final Configuration      configuration ;
 	private final ActionProcessor    actionProcessor ;
 	
-	private boolean traceFlag   = true ;
-	private void trace(String msg) {
-		if ( traceFlag ) {
-			String className = this.getClass().getSimpleName() ;
-			System.out.println("[TRACE] " + className +  " : " + msg );
-		}
-	}
+	private ConsoleLogger logger = ConsoleLogger.getLogger(ActionFilter.class);
 
 	/**
 	 * Constructor
 	 */
-	public ActionFilter() {
+	public ActionFilter(Configuration configuration) {
 		super();
-        trace("constructor()");
-		ConfigurationLoader configurationLoader = new ConfigurationLoader() ;
-		this.configuration = configurationLoader.loadConfiguration();
-		this.actionProcessor    = new ActionProcessor(configuration);
+		logger.trace("constructor()");
+		// ConfigurationLoader configurationLoader = new ConfigurationLoader() ;
+		// this.configuration = configurationLoader.loadConfiguration();
+		this.configuration = configuration ;
+		this.actionProcessor = new ActionProcessor(configuration);
 	}
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-        trace("init()");
+		logger.trace("init()");
 		//trace("Filter " + this.getClass().getSimpleName() + " initialized :" );
-		trace(" . actions package        = '" + this.configuration.getActionsPackage() + "'" ) ;
-		trace(" . default action         = '" + this.configuration.getDefaultAction() + "'" ) ;
-		trace(" . actions provider class = '" + this.configuration.getActionsProviderClassName() + "'" ) ;
-		trace(" . views folder           = '" + this.configuration.getViewsFolder() + "'" ) ;
-		trace(" . views suffix           = '" + this.configuration.getViewsSuffix() + "'" ) ;
-		trace(" . layouts folder         = '" + this.configuration.getLayoutsFolder() + "'" ) ;
+		logger.trace(" . actions package        = '" + this.configuration.getActionsPackage() + "'" ) ;
+		logger.trace(" . default action         = '" + this.configuration.getDefaultAction() + "'" ) ;
+		logger.trace(" . actions provider class = '" + this.configuration.getActionsProviderClassName() + "'" ) ;
+		logger.trace(" . views folder           = '" + this.configuration.getViewsFolder() + "'" ) ;
+		logger.trace(" . views suffix           = '" + this.configuration.getViewsSuffix() + "'" ) ;
+		logger.trace(" . layouts folder         = '" + this.configuration.getLayoutsFolder() + "'" ) ;
 	}
 	
 	@Override
 	public void destroy() {
-        trace("destroy()");
+		logger.trace("destroy()");
 	}
 
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) 
 						throws IOException, ServletException {
-        trace("doFilter()");
+		logger.trace("doFilter()");
         
         // TODO
 //		if ( request in action path ) {
@@ -89,7 +83,7 @@ public class ActionFilter implements Filter  {
         
         ActionInfo actionInfo = actionProcessor.processAction( (HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse );
         
-        trace("action '" + actionInfo.getName() +"' "
+        logger.trace("action '" + actionInfo.getName() +"' "
         		+ "--> " + actionInfo.getClassName() + "." + actionInfo.getMethodCalled() + "() "
         		+ "--> '" + actionInfo.getResult() + "' "
         		+ "--> '" + actionInfo.getView() + "' " 

@@ -17,23 +17,83 @@ package org.nanoj.web.tinymvc.processor;
 
 import java.util.logging.Level;
 
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import org.nanoj.util.ConsoleLoggerProvider;
+import org.nanoj.web.tinymvc.config.Configuration;
+import org.nanoj.web.tinymvc.config.ConfigurationLoader;
+import org.nanoj.web.tinymvc.util.ConsoleLogger;
 
-// Unused
-// @WebListener
+@WebListener
 public class WebAppContextListener implements ServletContextListener {
 	
+	private ConsoleLogger logger = ConsoleLogger.getLogger(WebAppContextListener.class);
+	
     @Override
-    public void contextInitialized(ServletContextEvent event) {
-        System.out.println("Web application started");
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+    	logger.info("NanoJ initialization");
+        
         ConsoleLoggerProvider.setGlobalLevelThreshold(Level.OFF);
+        
+
+        		
+        ServletContext servletContext = servletContextEvent.getServletContext();
+        Configuration configuration = loadConfiguration(servletContext);
+        
+        // TODO 
+        //ConsoleLogger.setGlobalLevel(configuration.getLoggerLevel());
+        ConsoleLogger.setGlobalLevel(ConsoleLogger.ALL);
+        
+        registerActionFilter(servletContext, configuration);
     }
-     
+    
+    private Configuration loadConfiguration(ServletContext servletContext) {
+		logger.trace("loadConfiguration()");
+		ConfigurationLoader configurationLoader = new ConfigurationLoader() ;
+		Configuration configuration = configurationLoader.loadConfiguration();
+		return configuration ;
+    }
+    
+    private void registerActionFilter(ServletContext servletContext, Configuration configuration) {
+		logger.trace("registerActionFilter()");
+        final String ActionFilterURLPatterns = "/*";
+
+    	// Filter instance creation
+        ActionFilter actionFilter = new ActionFilter(configuration);
+        logger.trace("ActionFilter created.");
+        
+        // Filter registration in the ServletContext
+        FilterRegistration.Dynamic dynamicFilterRegistration = servletContext.addFilter("zzzNanoJ", actionFilter);
+        logger.trace("ActionFilter registered.");
+        
+        // Filter mapping based on URL patterns
+        /*
+         * addMappingForUrlPatterns()
+         * 
+         * Adds a filter mapping with the given url patterns and dispatcher types for the Filter represented by this FilterRegistration.
+         * Filter mappings are matched in the order in which they were added.
+         * Depending on the value of the isMatchAfter parameter, the given filter mapping will be considered after or before any 
+         * declared filter mappings of the ServletContext from which this FilterRegistration was obtained.
+         * If this method is called multiple times, each successive call adds to the effects of the former. 
+         * Parameters:
+         *  - dispatcherTypes - the dispatcher types of the filter mapping, or null if the default DispatcherType.REQUEST is to be used
+         *  - isMatchAfter    - true if the given filter mapping should be matched after any declared filter mappings, 
+         *                      and false if it is supposed to be matched before any declared filter mappings 
+         *                      of the ServletContext from which this FilterRegistration was obtained
+         *  - urlPatterns     - the url patterns of the filter mapping 
+         */
+        //dynamicFilterRegistration.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, ActionFilterURLPatterns );
+        dynamicFilterRegistration.addMappingForUrlPatterns(null, true, ActionFilterURLPatterns );
+        logger.trace("ActionFilter mapping added.");
+        
+    }
+    
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        System.out.println("Web application stopped");
+    	logger.trace("contextDestroyed() : Web application stopped");
     }
 }
