@@ -13,13 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.nanoj.web.tinymvc;
+package org.nanoj.web.tinymvc.processor;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 
-@WebListener
+// Unused
+// @WebListener
 public class WebAppContextListener implements ServletContextListener {
 	
     @Override

@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.nanoj.web.tinymvc.servlet ;
+package org.nanoj.web.tinymvc.processor ;
 
 import java.util.logging.Logger;
 
@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.nanoj.util.ConsoleLoggerProvider;
 import org.nanoj.util.StrUtil;
-import org.nanoj.web.tinymvc.Const;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 

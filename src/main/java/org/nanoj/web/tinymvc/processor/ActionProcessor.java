@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.nanoj.web.tinymvc.servlet ;
+package org.nanoj.web.tinymvc.processor ;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,9 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.nanoj.web.tinymvc.Action;
-import org.nanoj.web.tinymvc.Configuration;
-import org.nanoj.web.tinymvc.Const;
 import org.nanoj.web.tinymvc.TinyMvcException;
+import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 import org.nanoj.web.tinymvc.env.FieldValuesManager;
 import org.nanoj.web.tinymvc.provider.ActionProvider;

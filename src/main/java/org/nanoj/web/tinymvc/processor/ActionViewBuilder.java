@@ -13,10 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.nanoj.web.tinymvc.servlet ;
+package org.nanoj.web.tinymvc.processor ;
 
-import org.nanoj.web.tinymvc.Configuration;
 import org.nanoj.web.tinymvc.TinyMvcException;
+import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 
 

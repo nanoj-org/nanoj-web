@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.nanoj.web.tinymvc;
+package org.nanoj.web.tinymvc.processor;
 
 public class Const {
 
@@ -23,13 +23,13 @@ public class Const {
 	 * Usable as "action.method=value" in a request URL  <br>
 	 * e.g. : "myaction?p1=1&p2=23&action.method=add"  <br>
 	 */
-	public final static String ACTION_METHOD_PARAMETER_NAME = "action.method" ;
+	protected final static String ACTION_METHOD_PARAMETER_NAME = "action.method" ;
 
 	/**
 	 * The attribute name for "action.method" value in the request scope <br>
 	 * Usable as ${METHOD} in the JSP <br>
 	 * This attribute contains the ACTION_METHOD_PARAMETER_NAME <br>
 	 */
-	public final static String ACTION_METHOD_ATTRIBUTE_NAME = "METHOD" ;
+	protected final static String ACTION_METHOD_ATTRIBUTE_NAME = "METHOD" ;
 	
 }
