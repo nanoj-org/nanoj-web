@@ -39,7 +39,9 @@ public class ActionInfo {
 	
 	private final String method ;
 
-	private String className = "?" ;
+	private String className = null ;
+	private String methodCalled = null ;
+	private String result = null ;
 
 	private String viewLayout = null ;
 
@@ -120,7 +122,22 @@ public class ActionInfo {
 	public String getClassName() {
 		return className;
 	}
-
+	
+	//---------------------------------------------------------------------------------
+	public void setMethodCalled(String methodCalled) {
+		this.methodCalled = methodCalled;
+	}
+	public String getMethodCalled() {
+		return methodCalled;
+	}
+	
+	//---------------------------------------------------------------------------------
+	public void setResult(String result) {
+		this.result = result;
+	}
+	public String getResult() {
+		return result;
+	}
 	
 	//---------------------------------------------------------------------------------
 	public String getViewLayout() {
@@ -138,6 +155,15 @@ public class ActionInfo {
 		this.viewPage = viewPage;
 	}
 
+	//---------------------------------------------------------------------------------
+	public String getView() {
+		if ( viewLayout != null ) {
+			return viewLayout + ":" + viewPage ;
+		}
+		else {
+			return viewPage;
+		}
+	}
 	//---------------------------------------------------------------------------------
 	@Override
 	public String toString() {

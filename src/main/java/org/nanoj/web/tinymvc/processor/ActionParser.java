@@ -33,7 +33,18 @@ public class ActionParser {
 	
 	private final static Logger LOGGER = ConsoleLoggerProvider.getLogger(ActionParser.class); 
 	
+	private final String defaultActionName ;
+
     /**
+     * Constructor
+     * @param defaultActionName
+     */
+    public ActionParser(String defaultActionName) {
+		super();
+		this.defaultActionName = defaultActionName;
+	}
+    
+	/**
      * Parses the given request URI in order to obtain action information
      * @param request
      * @return
@@ -81,66 +92,17 @@ public class ActionParser {
 			methodName = null ; // no specific method
 		}
 		
-		if ( null == methodName ) {
-			//--- Try to find the method name in the request parameters ( e.g. for named submit buttons )
-			String s = request.getParameter( Const.ACTION_METHOD_PARAMETER_NAME );
-			if ( s != null ) {
-				methodName = s.trim() ;
-			}
-		}
-
-		return new ActionInfo(request, actionName, methodName );
-			
-    }
-    /**
-     * Parses the given request URI in order to obtain action information
-     * @param request
-     * @return
-     */
-    public ActionInfo parseActionURI_OLD( final HttpServletRequest request )  {
-		String path = request.getPathInfo(); // path after the servlet URL pattern
-		LOGGER.info("request.getPathInfo() : " + path );
-		// path can be :
-		//   . null (eg 'mywebapp/action' )
-		//   . '/'  (eg 'mywebapp/action/' )
-		//   . '/myaction'  (eg 'mywebapp/action/myaction' )
-		//   . '/myaction/' (eg 'mywebapp/action/myaction/' )
-		
-		if ( null == path || "".equals(path) || "/".equals(path) ) {
-			path="/" ; 
-		}
-		
-		String actionString = path.substring(1); //  "/myaction" --> "myaction"
-
-		String actionName = null;
-		String methodName = null; // specific method (if any)
-		
-		//--- Get action name and method name from "PathInfo"
-		if ( actionString.length() > 0 ) {
-			
-			int pointPosition = actionString.indexOf('.') ;
-			if ( pointPosition == 0 ) {
-				throw new TinyMvcException("Invalid action name (starts with '.')" );
-			}
-			else if ( pointPosition == actionString.length()-1 ) {
-				throw new TinyMvcException("Invalid action name (ends with '.')" );
-			}
-			else if ( pointPosition > 0 ) {
-				actionName = actionString.substring(0, pointPosition) ; // left part
-				methodName = actionString.substring(pointPosition+1, actionString.length()); // right part
+		//--- If action name is still undefined => try to set the default action name
+		if ( StrUtil.nullOrVoid(actionName) ) {
+			if ( this.defaultActionName != null ) {
+				actionName = this.defaultActionName ;
 			}
 			else {
-				// If < 0 : No point (keep the name as is, no method )
-				actionName = actionString ;
-				methodName = null ; // no specific method
+				throw new TinyMvcException("No action name and no default action" );
 			}
 		}
-		else {
-			actionName = "" ; // void action name
-			methodName = null ; // no specific method
-		}
-		
-		if ( null == methodName ) {
+
+		if ( methodName == null ) {
 			//--- Try to find the method name in the request parameters ( e.g. for named submit buttons )
 			String s = request.getParameter( Const.ACTION_METHOD_PARAMETER_NAME );
 			if ( s != null ) {
@@ -151,4 +113,5 @@ public class ActionParser {
 		return new ActionInfo(request, actionName, methodName );
 			
     }
+
 }

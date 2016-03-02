@@ -21,41 +21,51 @@ import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.nanoj.util.StrUtil;
 import org.nanoj.web.tinymvc.Action;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 import org.nanoj.web.tinymvc.env.FieldValuesManager;
 import org.nanoj.web.tinymvc.provider.ActionProvider;
-import org.nanoj.web.tinymvc.provider.DefaultActionProvider;
+import org.nanoj.web.tinymvc.provider.StandardActionProvider;
 import org.nanoj.web.tinymvc.provider.InstanceProvider;
 
 
 /**
- * Action processing called by the Servlet ( SINGLE INSTANCE )
+ * Action processing ( SINGLE INSTANCE ) <br>
+ * The entry point to process an action ( called by the Servlet or ServletFilter )<br>
  * 
  * @author Laurent GUERIN
  */
 public class ActionProcessor {
 
+	private final ActionParser        actionParser  ;
 	private final ActionProvider      actionProvider  ;
+	private final ActionViewRenderer  actionViewRenderer ;
 	private final FieldValuesManager  fieldValuesManager ;
-
 
 	private void trace(String msg) {
 		
 	}
 	
-	public ActionProcessor(Configuration actionServletConfig) {
+	/**
+	 * Constructor
+	 * @param actionServletConfig
+	 */
+	public ActionProcessor(Configuration configuration) {
 		super();
 		
+		this.actionParser       = new ActionParser( configuration.getDefaultAction() ) ;
+		this.actionViewRenderer = new ActionViewRenderer(configuration);
+
 		//--- Initialize FieldValuesManager
 		fieldValuesManager = FieldValuesManager.getInstance() ;
 		
 		//--- Initialize ActionProvider
-		String actionProviderClassName = actionServletConfig.getActionsProviderClassName() ;
-		String actionsPackage          = actionServletConfig.getActionsPackage();
-		String defaultAction           = actionServletConfig.getDefaultAction();
+		String actionProviderClassName = configuration.getActionsProviderClassName() ;
+		String actionsPackage          = configuration.getActionsPackage();
+//		String defaultAction           = configuration.getDefaultAction();
 		
 		if ( actionProviderClassName != null ) {
 			//--- Get instance of the action provider class (defined in configuration)
@@ -63,21 +73,60 @@ public class ActionProcessor {
 	    	trace("action provider initialized ( class = " + actionProviderClassName + " )");
 		}
 		else {
-			//--- No action provider class defined => try to use "Convention over Configuration"
+			//--- No specific action provider class defined => use the standard action provider based on "Convention over Configuration"
 			if ( actionsPackage != null ) {
-		    	trace("actions package = '" + actionsPackage + "'");
-				if ( defaultAction != null ) {
-			    	trace("default action = '" + defaultAction + "'");
-				}
-				else {
-			    	trace("no default action ");
-				}
-				this.actionProvider = new DefaultActionProvider( actionsPackage, defaultAction ) ;
-		    	trace("action provider initialized ( class = " + DefaultActionProvider.class.getCanonicalName() + " )");
+//		    	trace("actions package = '" + actionsPackage + "'");
+//				if ( defaultAction != null ) {
+//			    	trace("default action = '" + defaultAction + "'");
+//				}
+//				else {
+//			    	trace("no default action ");
+//				}
+//				this.actionProvider = new StandardActionProvider( actionsPackage, defaultAction ) ;
+				this.actionProvider = new StandardActionProvider( actionsPackage ) ;
+		    	trace("action provider initialized ( class = " + StandardActionProvider.class.getCanonicalName() + " )");
 			}
 			else {
 				throw new TinyMvcException("Cannot get action : no action provider class and no actions package " );
 			}
+		}
+	}
+	
+	/**
+	 * Process the action defined by the given request 
+	 * @param request
+	 * @param response
+	 * @return information about the action processed
+	 */
+	public ActionInfo processAction(HttpServletRequest request, HttpServletResponse response) {
+        
+		//--- 1) Get action information from the request URL
+		ActionInfo actionInfo = actionParser.parseActionURI(request);
+		trace("--- ActionInfo : " + actionInfo );
+		
+		//--- 2) Execute the action controller
+		String actionResult = executeAction(actionInfo, request, response);
+		
+		if ( actionResult == null ) {
+			throw new TinyMvcException("Action result is null (action " + actionInfo.getClassName() + ")" );
+		}
+		if ( actionResult.trim().length() == 0 ) {
+			throw new TinyMvcException("Action result is void (action " + actionInfo.getClassName() + ")" );
+		}
+
+		//--- 3) Dispatch (forward) to VIEW ( with or without template )  				
+		actionViewRenderer.render(actionResult, actionInfo, request, response);
+		
+		return actionInfo ;
+	}
+    
+	private String getMethodToCall(ActionInfo actionInfo) {
+		if ( StrUtil.nullOrVoid( actionInfo.getMethod() ) ) {
+			// The method is not defined in the request
+			return "process" ; // Default method 
+		}
+		else {
+			return actionInfo.getMethod() ;
 		}
 	}
 
@@ -89,7 +138,7 @@ public class ActionProcessor {
      * @param response
      * @return
      */
-    public String executeAction(final ActionInfo actionInfo, 
+    private String executeAction(final ActionInfo actionInfo, 
     		final HttpServletRequest request, final HttpServletResponse response )  {
     	
 		//--- Get the action controller ( associated with the action name )
@@ -103,17 +152,17 @@ public class ActionProcessor {
 		
 		//--- Execute the action controller and get the view page 
 		String actionResult = null ;
-		String actionMethodName = actionInfo.getMethod() ;
-		String method = ( actionMethodName != null ? actionMethodName : "process" ) ;
+//		String actionMethodName = actionInfo.getMethod() ;
+		String methodToCall = getMethodToCall(actionInfo) ;
 
 		try {
 			//--- BEFORE ACTION CALL
-			action.beforeAction(method, request, response);
+			action.beforeAction(methodToCall, request, response);
 			
 			//--- ACTION CALL
-			if ( actionMethodName != null ) {
-				//--- Execute the specific action method
-				actionResult = executeSpecificMethod( action, actionMethodName, request, response ) ;
+			if ( actionInfo.getMethod() != null ) {
+				//--- Execute the action method specified in the request
+				actionResult = executeSpecificMethod( action, methodToCall, request, response ) ;
 			}
 			else {
 				//--- Execute the default method "process"
@@ -122,9 +171,12 @@ public class ActionProcessor {
 		}
 		finally {
 			//--- AFTER ACTION CALL
-			action.afterAction(method, request, response);
+			action.afterAction(methodToCall, request, response);
 		}
 
+		actionInfo.setMethodCalled(methodToCall);
+		actionInfo.setResult(actionResult);
+		
     	trace ("action result = '" + actionResult + "'");
     	return actionResult ;
     }
@@ -138,9 +190,9 @@ public class ActionProcessor {
     	
     	trace("getAction('" + actionInfo.getName() + "')" );
     	
-		if ( null == this.actionProvider ) {
-			throw new TinyMvcException("Action provider is not initialized");
-		}
+//		if ( null == this.actionProvider ) {
+//			throw new TinyMvcException("Action provider is not initialized");
+//		}
 		
 		Action action = this.actionProvider.getAction( actionInfo.getName() ) ;
 		if ( null == action ) {

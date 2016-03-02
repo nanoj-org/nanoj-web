@@ -27,7 +27,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.config.ConfigurationLoader;
 import org.nanoj.web.tinymvc.env.ActionInfo;
@@ -36,9 +35,8 @@ import org.nanoj.web.tinymvc.env.ActionInfo;
 public class ActionFilter implements Filter  {
 	
 	private final Configuration      configuration ;
-	private final ActionParser       actionParser  ;
 	private final ActionProcessor    actionProcessor ;
-	private final ActionViewRenderer actionViewRenderer ;
+//	private final ActionViewRenderer actionViewRenderer ;
 	
 	
 	private boolean traceFlag   = true ;
@@ -57,9 +55,8 @@ public class ActionFilter implements Filter  {
         trace("constructor()");
 		ConfigurationLoader configurationLoader = new ConfigurationLoader() ;
 		this.configuration = configurationLoader.loadConfiguration();
-		this.actionParser       = new ActionParser() ;
 		this.actionProcessor    = new ActionProcessor(configuration);
-		this.actionViewRenderer = new ActionViewRenderer(configuration);
+//		this.actionViewRenderer = new ActionViewRenderer(configuration);
 	}
 
 	@Override
@@ -83,34 +80,22 @@ public class ActionFilter implements Filter  {
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) 
 						throws IOException, ServletException {
         trace("doFilter()");
+        
+        // TODO
 //		if ( request in action path ) {
 //			processAction(servletRequest, servletResponse);
 //		}
 //		else {
 //	        chain.doFilter(request, response);			
 //		}
-		processAction(servletRequest, servletResponse);
+        
+        ActionInfo actionInfo = actionProcessor.processAction( (HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse );
+        
+        trace("action '" + actionInfo.getName() +"' "
+        		+ "--> " + actionInfo.getClassName() + "." + actionInfo.getMethodCalled() + "() "
+        		+ "--> '" + actionInfo.getResult() + "' "
+        		+ "--> '" + actionInfo.getView() + "' " 
+        		);
 	}
 	
-	public void processAction(ServletRequest servletRequest, ServletResponse servletResponse) {
-        final HttpServletRequest  request  = (HttpServletRequest)  servletRequest ;
-        final HttpServletResponse response = (HttpServletResponse) servletResponse ;
-        
-		//--- 1) Get action information from the request URL
-		ActionInfo actionInfo = actionParser.parseActionURI(request);
-		trace("--- ActionInfo : " + actionInfo );
-		
-		//--- 2) Execute the action controller
-		String actionResult = actionProcessor.executeAction(actionInfo, request, response);
-		
-		if ( actionResult == null ) {
-			throw new TinyMvcException("Action result is null (action " + actionInfo.getClassName() + ")" );
-		}
-		if ( actionResult.trim().length() == 0 ) {
-			throw new TinyMvcException("Action result is void (action " + actionInfo.getClassName() + ")" );
-		}
-
-		//--- 3) Dispatch (forward) to VIEW ( with or without template )  				
-		actionViewRenderer.render(actionResult, actionInfo, request, response);
-	}
 }
