@@ -60,7 +60,7 @@ public class WebAppContextListener implements ServletContextListener {
     
     private void registerActionFilter(ServletContext servletContext, Configuration configuration) {
 		logger.trace("registerActionFilter()");
-        final String ActionFilterURLPatterns = "/*";
+        //final String ActionFilterURLPatterns = "/*";
 
     	// Filter instance creation
         ActionFilter actionFilter = new ActionFilter(configuration);
@@ -87,8 +87,8 @@ public class WebAppContextListener implements ServletContextListener {
          *  - urlPatterns     - the url patterns of the filter mapping 
          */
         //dynamicFilterRegistration.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, ActionFilterURLPatterns );
-        dynamicFilterRegistration.addMappingForUrlPatterns(null, true, ActionFilterURLPatterns );
-        logger.trace("ActionFilter mapping added.");
+        dynamicFilterRegistration.addMappingForUrlPatterns(null, true, configuration.getActionsPattern() );
+        logger.trace("ActionFilter mapping added (pattern = " + configuration.getActionsPattern() + ")");
         
     }
     
