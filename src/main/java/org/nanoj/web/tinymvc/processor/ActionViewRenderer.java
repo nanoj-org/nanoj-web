@@ -37,23 +37,32 @@ import org.nanoj.web.tinymvc.env.ActionInfo;
 public class ActionViewRenderer {
 	
 	//--- Attributes
-//	private final ServletContext     servletContext ;
-	private final ActionViewBuilder  actionViewBuilder ;
+//	private final ActionViewBuilder  actionViewBuilder ;
+	private final Configuration configuration ;
 
-//    public ActionViewRenderer( ServletContext servletContext, Configuration actionServletConfig ) {
-	public ActionViewRenderer( Configuration actionServletConfig ) {
+	public ActionViewRenderer( Configuration configuration ) {
 		super();
-		this.actionViewBuilder = new ActionViewBuilder(actionServletConfig);
-//		this.servletContext = servletContext ;
+		//this.actionViewBuilder = new ActionViewBuilder(configuration);
+		this.configuration = configuration ;
 	}
 
-    public void render( final String actionResult, final ActionInfo actionInfo, 
+    public void render( final String actionResultString, final ActionInfo actionInfo, 
     		final HttpServletRequest request, final HttpServletResponse response) {
-		String targetPage = actionViewBuilder.getTargetPage(actionResult, actionInfo);
+		
+		ActionResult actionResult = new ActionResult(actionResultString, configuration);
+
+//		String targetPage = actionViewBuilder.getTargetPage(actionResultObject, actionInfo);
+		
+		String targetPage = actionResult.getTargetFullPath();
 		
 		if ( StrUtil.nullOrVoid(targetPage) ) {
 			throw new TinyMvcException("No target page for action '" + actionInfo.getName() + "'");
 		}
+		
+    	actionInfo.setViewPage( actionResult.getViewFullPath() );
+    	actionInfo.setViewLayout( actionResult.getLayoutFullPath() );
+
+//		actionResult.getView();
 		
 		//--- Set action model in request scope
 		request.setAttribute("action", actionInfo);
