@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 import org.nanoj.web.tinymvc.config.Configuration;
+import org.nanoj.web.tinymvc.processor.ActionResult;
 
 public class ActionResultTests {
 	

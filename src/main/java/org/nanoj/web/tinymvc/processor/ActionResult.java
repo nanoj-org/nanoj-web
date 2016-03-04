@@ -26,14 +26,15 @@ import org.nanoj.web.tinymvc.config.Configuration;
 public class ActionResult {
 	
 	//--- Attributes
-	private final String view;
-	private final String viewFullPath;
+	private final String view ;
+	private final String viewFullPath ;
 	private final String layout ;
 	private final String layoutFullPath ;
 
 	/**
 	 * Constructor
 	 * @param actionResult actionResult string : 'view' or 'view:layout'
+	 * @param configuration
 	 */
 	public ActionResult( String actionResult, Configuration configuration ) {
 		super();
@@ -72,20 +73,50 @@ public class ActionResult {
 		}
 	}
 
+	//------------------------------------------------------------------------------
+	/**
+	 * Returns the view name in short format (never null) <br>
+	 * e.g. : "mypage"
+	 * @return 
+	 */
 	public String getView() {
     	return view;
     }
+	/**
+	 * Returns the view in 'full path' format (never null) <br>
+	 * e.g. : "/WEB-INF/views/mypage.jsp"
+	 * @return
+	 */
 	public String getViewFullPath() {
     	return viewFullPath;
     }
 
+	//------------------------------------------------------------------------------
+	/**
+	 * Returns the layout name in short format (can be null) <br>
+	 * e.g. : "mylayout"
+	 * @return
+	 */
 	public String getLayout() {
     	return layout;
     }
+	/**
+	 * Returns the layout name in 'full path'  format (can be null) <br>
+	 * e.g. : "/WEB-INF/layouts/mylayout.jsp"
+	 * @return
+	 */
 	public String getLayoutFullPath() {
     	return layoutFullPath;
     }
+	/**
+	 * Returns true if the action result has a layout 
+	 * @return
+	 */
+	public boolean hasLayout() {
+    	return layout != null ;
+    }
 
+	//------------------------------------------------------------------------------
 	/**
 	 * Returns the target full path ( view page full path or layout full path )
 	 * @return

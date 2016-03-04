@@ -59,6 +59,12 @@
 			<artifactId>nanoj-injector</artifactId>
 			<version>0.8.1-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<version>2.1.4.RELEASE</version>
+		</dependency>
 
 		<!-- FOR TESTS -->
 		<dependency>

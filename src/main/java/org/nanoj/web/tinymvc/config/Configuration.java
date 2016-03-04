@@ -25,21 +25,26 @@ import java.util.Properties;
 public class Configuration {
 
 	//--- Parameters names
-	private static final String DEFAULT_ACTION    = "defaultAction" ;
-	private static final String ACTIONS_PATTERN   = "actionsPattern" ;
-	private static final String ACTIONS_PACKAGE   = "actionsPackage" ;
-	private static final String ACTIONS_PROVIDER  = "actionsProvider" ;
+	protected static final String DEFAULT_ACTION    = "defaultAction" ;
+	protected static final String ACTIONS_PATTERN   = "actionsPattern" ;
+	protected static final String ACTIONS_PACKAGE   = "actionsPackage" ;
+	protected static final String ACTIONS_PROVIDER  = "actionsProvider" ;
 
-	private static final String VIEWS_FOLDER      = "viewsFolder" ;
-	private static final String VIEWS_SUFFIX      = "viewsSuffix" ;
-	private static final String LAYOUTS_FOLDER    = "layoutsFolder" ;
+	protected static final String VIEWS_FOLDER      = "viewsFolder" ;
+	protected static final String VIEWS_SUFFIX      = "viewsSuffix" ;
+	protected static final String LAYOUTS_FOLDER    = "layoutsFolder" ;
+	protected static final String LAYOUTS_SUFFIX    = "layoutsSuffix" ;
+	
 	
 	//--- Default values
 	private static final String ACTIONS_PATTERN_DEFAULT_VALUE  = "/*" ;
-	private static final String DEFAULT_ACTION_DEFAULT_VALUE  = "welcome" ;
-	private static final String VIEWS_FOLDER_DEFAULT_VALUE    = "/WEB-INF/views/" ;
-	private static final String VIEWS_SUFFIX_DEFAULT_VALUE    = ".jsp" ;
-	private static final String LAYOUTS_FOLDER_DEFAULT_VALUE  = "/WEB-INF/layouts/" ;
+	private static final String DEFAULT_ACTION_DEFAULT_VALUE   = "welcome" ;
+	
+	private static final String VIEWS_FOLDER_DEFAULT_VALUE     = "/WEB-INF/views/" ;
+	private static final String VIEWS_SUFFIX_DEFAULT_VALUE     = ".jsp" ;
+	
+	private static final String LAYOUTS_FOLDER_DEFAULT_VALUE   = "/WEB-INF/layouts/" ;
+	private static final String LAYOUTS_SUFFIX_DEFAULT_VALUE   = ".jsp" ;
 
 	
 	//--- Attributes
@@ -49,6 +54,8 @@ public class Configuration {
 	
 	private String layoutsFolder  = LAYOUTS_FOLDER_DEFAULT_VALUE ; 
 
+	private String layoutsSuffix  = LAYOUTS_SUFFIX_DEFAULT_VALUE ; 
+
 	private String defaultAction  = DEFAULT_ACTION_DEFAULT_VALUE ; 
 	
 	private String actionsPattern = null ; 
@@ -57,23 +64,6 @@ public class Configuration {
 	
 	private String actionsProviderClassName = null ; 
 		
-//	/**
-//	 * Constructor
-//	 * @param config
-//	 */
-//	public Configuration(ServletConfig config) {	
-//		//--- Actions
-//		setActionsPattern(config.getInitParameter(ACTIONS_PATTERN)) ;
-//		setDefaultAction(config.getInitParameter(DEFAULT_ACTION));
-//		setActionsPackage(config.getInitParameter(ACTIONS_PACKAGE)) ;
-//		setActionsProviderClassName(config.getInitParameter(ACTIONS_PROVIDER)) ;
-//		//--- Views
-//		setViewsFolder(config.getInitParameter(VIEWS_FOLDER)) ;
-//		setViewsSuffix(config.getInitParameter(VIEWS_SUFFIX));
-//		//--- Layouts
-//		setLayoutsFolder(config.getInitParameter(LAYOUTS_FOLDER));
-//	}
-	
 	/**
 	 * Constructor
 	 * @param properties
@@ -88,7 +78,8 @@ public class Configuration {
 		setViewsFolder(properties.getProperty(VIEWS_FOLDER)) ;
 		setViewsSuffix(properties.getProperty(VIEWS_SUFFIX));
 		//--- Layouts
-		setLayoutsFolder(properties.getProperty(LAYOUTS_FOLDER));				
+		setLayoutsFolder(properties.getProperty(LAYOUTS_FOLDER));
+		setLayoutsSuffix(properties.getProperty(LAYOUTS_SUFFIX));
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -107,49 +98,80 @@ public class Configuration {
 		}
 		return defaultValue ;
 	}
-	//--------------------------------------------------------------------------------
-	private void setLayoutsFolder(String param) {
-		if ( param != null ) {
-			if ( param.endsWith("/") ) {
-				this.layoutsFolder = param.trim()  ;
+	
+	private String suffixValue(String paramValue, String defaultValue) {
+		if ( paramValue != null ) {
+			if ( paramValue.startsWith(".") ) {
+				return paramValue.trim()  ;
 			}
 			else {
-				this.layoutsFolder = param.trim()  + "/";
+				return "." + paramValue.trim()  ;
 			}
 		}
-		else {
-			this.layoutsFolder = LAYOUTS_FOLDER_DEFAULT_VALUE ;
-		}
+		return defaultValue ;
 	}
 
-	private void setViewsFolder(String param) {
-		if ( param != null ) {
-			if ( param.endsWith("/") ) {
-				this.viewsFolder = param.trim()  ;
+	private String folderValue(String paramValue, String defaultValue) {
+		if ( paramValue != null ) {
+			if ( paramValue.endsWith("/") ) {
+				return paramValue.trim()  ;
 			}
 			else {
-				this.viewsFolder = param.trim() + "/";
+				return paramValue.trim()  + "/";
 			}
 		}
-		else {
-			this.viewsFolder = VIEWS_FOLDER_DEFAULT_VALUE ;
-		}
+		return defaultValue ;
+	}
+	//--------------------------------------------------------------------------------
+	private void setViewsFolder(String param) {
+//		if ( param != null ) {
+//			if ( param.endsWith("/") ) {
+//				this.viewsFolder = param.trim()  ;
+//			}
+//			else {
+//				this.viewsFolder = param.trim() + "/";
+//			}
+//		}
+//		else {
+//			this.viewsFolder = VIEWS_FOLDER_DEFAULT_VALUE ;
+//		}
+		this.viewsFolder = folderValue(param, VIEWS_FOLDER_DEFAULT_VALUE);
 	}
 	
 	private void setViewsSuffix(String param) {
-		if ( param != null ) {
-			if ( param.startsWith(".") ) {
-				this.viewsSuffix = param.trim()  ;
-			}
-			else {
-				this.viewsSuffix = "." + param.trim()  ;
-			}
-		}
-		else {
-			this.viewsSuffix = VIEWS_SUFFIX_DEFAULT_VALUE ;
-		}
+//		if ( param != null ) {
+//			if ( param.startsWith(".") ) {
+//				this.viewsSuffix = param.trim()  ;
+//			}
+//			else {
+//				this.viewsSuffix = "." + param.trim()  ;
+//			}
+//		}
+//		else {
+//			this.viewsSuffix = VIEWS_SUFFIX_DEFAULT_VALUE ;
+//		}
+		this.viewsSuffix = suffixValue(param, VIEWS_SUFFIX_DEFAULT_VALUE);
 	}	
 
+	private void setLayoutsFolder(String param) {
+//		if ( param != null ) {
+//			if ( param.endsWith("/") ) {
+//				this.layoutsFolder = param.trim()  ;
+//			}
+//			else {
+//				this.layoutsFolder = param.trim()  + "/";
+//			}
+//		}
+//		else {
+//			this.layoutsFolder = LAYOUTS_FOLDER_DEFAULT_VALUE ;
+//		}
+		this.layoutsFolder = folderValue(param, LAYOUTS_FOLDER_DEFAULT_VALUE);
+	}
+
+	private void setLayoutsSuffix(String param) {
+		this.layoutsSuffix = suffixValue(param, LAYOUTS_SUFFIX_DEFAULT_VALUE);
+	}
+	
 	private void setActionsPattern(String param) {
 		this.actionsPattern = paramValue(param, ACTIONS_PATTERN_DEFAULT_VALUE);
 	}
@@ -159,22 +181,10 @@ public class Configuration {
 	}
 
 	private void setActionsPackage(String param) {
-//		if ( param != null ) {
-//			this.actionsPackage = param.trim()  ;
-//		}
-//		else {
-//			this.actionsPackage = null ;
-//		}
 		this.actionsPackage = paramValue(param, null);
 	}
 
 	private void setActionsProviderClassName(String param) {
-//		if ( param != null ) {
-//			this.actionsProviderClassName = param.trim() ;
-//		}
-//		else {
-//			this.actionsProviderClassName = null ;
-//		}		
 		this.actionsProviderClassName = paramValue(param, null);
 	}
 	
@@ -188,6 +198,9 @@ public class Configuration {
 
 	public String getLayoutsFolder() {
 		return layoutsFolder;
+	}
+	public String getLayoutsSuffix() {
+		return layoutsSuffix;
 	}
 
 	public String getDefaultAction() {
