@@ -30,16 +30,18 @@ public class Configuration {
 	protected static final String ACTIONS_PACKAGE   = "actionsPackage" ;
 	protected static final String ACTIONS_PROVIDER  = "actionsProvider" ;
 
+	protected static final String VIEWS_TYPE        = "viewsType" ;
 	protected static final String VIEWS_FOLDER      = "viewsFolder" ;
 	protected static final String VIEWS_SUFFIX      = "viewsSuffix" ;
 	protected static final String LAYOUTS_FOLDER    = "layoutsFolder" ;
 	protected static final String LAYOUTS_SUFFIX    = "layoutsSuffix" ;
 	
-	
 	//--- Default values
 	private static final String ACTIONS_PATTERN_DEFAULT_VALUE  = "/*" ;
 	private static final String DEFAULT_ACTION_DEFAULT_VALUE   = "welcome" ;
 	
+	private static final String VIEWS_TYPE_DEFAULT_VALUE       = "jsp" ;
+
 	private static final String VIEWS_FOLDER_DEFAULT_VALUE     = "/WEB-INF/views/" ;
 	private static final String VIEWS_SUFFIX_DEFAULT_VALUE     = ".jsp" ;
 	
@@ -47,22 +49,22 @@ public class Configuration {
 	private static final String LAYOUTS_SUFFIX_DEFAULT_VALUE   = ".jsp" ;
 
 	
-	//--- Attributes
-	private String viewsFolder    = VIEWS_FOLDER_DEFAULT_VALUE ; 
+	//--- Actions attributes
+	private String defaultAction  = DEFAULT_ACTION_DEFAULT_VALUE ; 
+	private String actionsPattern = null ; 
+	private String actionsPackage = null ; 
+	private String actionsProviderClassName = null ; 
 
+	//--- Views and Layouts attributes
+	private String    viewsTypeString = VIEWS_TYPE_DEFAULT_VALUE ; 
+	private ViewsType viewsType       = null ; 
+
+	private String viewsFolder    = VIEWS_FOLDER_DEFAULT_VALUE ; 
 	private String viewsSuffix    = VIEWS_SUFFIX_DEFAULT_VALUE ; 
 	
 	private String layoutsFolder  = LAYOUTS_FOLDER_DEFAULT_VALUE ; 
-
 	private String layoutsSuffix  = LAYOUTS_SUFFIX_DEFAULT_VALUE ; 
 
-	private String defaultAction  = DEFAULT_ACTION_DEFAULT_VALUE ; 
-	
-	private String actionsPattern = null ; 
-
-	private String actionsPackage = null ; 
-	
-	private String actionsProviderClassName = null ; 
 		
 	/**
 	 * Constructor
@@ -74,10 +76,10 @@ public class Configuration {
 		setDefaultAction(properties.getProperty(DEFAULT_ACTION));
 		setActionsPackage(properties.getProperty(ACTIONS_PACKAGE)) ;
 		setActionsProviderClassName(properties.getProperty(ACTIONS_PROVIDER)) ;
-		//--- Views
+		//--- Views and Layouts
+		setViewsType(properties.getProperty(VIEWS_TYPE)) ;
 		setViewsFolder(properties.getProperty(VIEWS_FOLDER)) ;
 		setViewsSuffix(properties.getProperty(VIEWS_SUFFIX));
-		//--- Layouts
 		setLayoutsFolder(properties.getProperty(LAYOUTS_FOLDER));
 		setLayoutsSuffix(properties.getProperty(LAYOUTS_SUFFIX));
 	}
@@ -123,51 +125,25 @@ public class Configuration {
 		return defaultValue ;
 	}
 	//--------------------------------------------------------------------------------
+	private void setViewsType(String param) {
+		this.viewsTypeString = paramValue(param, VIEWS_TYPE_DEFAULT_VALUE).toLowerCase();
+		if ( "thymeleaf".equals(this.viewsTypeString ) ) {
+			this.viewsType = ViewsType.THYMELEAF ;
+		}
+		else {
+			this.viewsType = ViewsType.JSP ;
+		}
+	}	
 	private void setViewsFolder(String param) {
-//		if ( param != null ) {
-//			if ( param.endsWith("/") ) {
-//				this.viewsFolder = param.trim()  ;
-//			}
-//			else {
-//				this.viewsFolder = param.trim() + "/";
-//			}
-//		}
-//		else {
-//			this.viewsFolder = VIEWS_FOLDER_DEFAULT_VALUE ;
-//		}
 		this.viewsFolder = folderValue(param, VIEWS_FOLDER_DEFAULT_VALUE);
-	}
-	
+	}	
 	private void setViewsSuffix(String param) {
-//		if ( param != null ) {
-//			if ( param.startsWith(".") ) {
-//				this.viewsSuffix = param.trim()  ;
-//			}
-//			else {
-//				this.viewsSuffix = "." + param.trim()  ;
-//			}
-//		}
-//		else {
-//			this.viewsSuffix = VIEWS_SUFFIX_DEFAULT_VALUE ;
-//		}
 		this.viewsSuffix = suffixValue(param, VIEWS_SUFFIX_DEFAULT_VALUE);
 	}	
 
 	private void setLayoutsFolder(String param) {
-//		if ( param != null ) {
-//			if ( param.endsWith("/") ) {
-//				this.layoutsFolder = param.trim()  ;
-//			}
-//			else {
-//				this.layoutsFolder = param.trim()  + "/";
-//			}
-//		}
-//		else {
-//			this.layoutsFolder = LAYOUTS_FOLDER_DEFAULT_VALUE ;
-//		}
 		this.layoutsFolder = folderValue(param, LAYOUTS_FOLDER_DEFAULT_VALUE);
 	}
-
 	private void setLayoutsSuffix(String param) {
 		this.layoutsSuffix = suffixValue(param, LAYOUTS_SUFFIX_DEFAULT_VALUE);
 	}
@@ -175,20 +151,20 @@ public class Configuration {
 	private void setActionsPattern(String param) {
 		this.actionsPattern = paramValue(param, ACTIONS_PATTERN_DEFAULT_VALUE);
 	}
-
 	private void setDefaultAction(String param) {
 		this.actionsPackage = paramValue(param, DEFAULT_ACTION_DEFAULT_VALUE);
 	}
-
 	private void setActionsPackage(String param) {
 		this.actionsPackage = paramValue(param, null);
 	}
-
 	private void setActionsProviderClassName(String param) {
 		this.actionsProviderClassName = paramValue(param, null);
 	}
 	
 	//--------------------------------------------------------------------------------
+	public ViewsType getViewsType() {
+		return viewsType;
+	}
 	public String getViewsFolder() {
 		return viewsFolder;
 	}

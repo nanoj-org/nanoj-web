@@ -30,6 +30,7 @@ import org.nanoj.web.tinymvc.env.FieldValuesManager;
 import org.nanoj.web.tinymvc.provider.ActionProvider;
 import org.nanoj.web.tinymvc.provider.StandardActionProvider;
 import org.nanoj.web.tinymvc.provider.InstanceProvider;
+import org.nanoj.web.tinymvc.util.ConsoleLogger;
 
 
 /**
@@ -39,6 +40,8 @@ import org.nanoj.web.tinymvc.provider.InstanceProvider;
  * @author Laurent GUERIN
  */
 public class ActionProcessor {
+	
+	private final ConsoleLogger       logger = ConsoleLogger.getLogger(ActionProcessor.class);
 
 	private final ActionParser        actionParser  ;
 	private final ActionProvider      actionProvider  ;
@@ -115,7 +118,18 @@ public class ActionProcessor {
 		}
 
 		//--- 3) Dispatch (forward) to VIEW ( with or without template )  				
-		actionViewRenderer.render(actionResult, actionInfo, request, response);
+		try {
+			actionViewRenderer.render(actionResult, actionInfo, request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("cannot render action '" + actionInfo.getName() 
+					+ "' --> " + actionInfo.getClassName() + "." + actionInfo.getMethod() + "()"
+					+ " --> result = '" + actionResult +"'" );
+			logger.error(" . result      = '" + actionInfo.getResult() + "'" );
+			logger.error(" . view        = '" + actionInfo.getView() + "'" );
+			logger.error(" . view layout = '" + actionInfo.getViewLayout() + "'" );
+			logger.error(" . view page   = '" + actionInfo.getViewPage() + "'" );
+		}
 		
 		return actionInfo ;
 	}

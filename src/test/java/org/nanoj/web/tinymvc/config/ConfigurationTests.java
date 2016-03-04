@@ -44,6 +44,8 @@ public class ConfigurationTests {
 		
 		assertNull(config.getActionsPackage());
 		assertNull(config.getActionsProviderClassName() );
+
+		assertEquals(ViewsType.JSP, config.getViewsType());
 	}
 	
 	@Test
@@ -73,5 +75,46 @@ public class ConfigurationTests {
 		
 		assertEquals(".bar",          config.getLayoutsSuffix() );
 		assertEquals("/WEB-INF/bar/", config.getLayoutsFolder() );
+	}
+
+	@Test
+	public void test3() {
+		
+		Properties p ;
+		Configuration config ;
+		
+		p = new Properties();
+		config = new Configuration(p);
+		assertEquals(ViewsType.JSP, config.getViewsType());
+
+		p = new Properties();
+		p.setProperty(Configuration.VIEWS_TYPE,   "xxx"); 
+		config = new Configuration(p);
+		assertEquals(ViewsType.JSP, config.getViewsType());
+
+		p = new Properties();
+		p.setProperty(Configuration.VIEWS_TYPE,   "jsp"); 
+		config = new Configuration(p);
+		assertEquals(ViewsType.JSP, config.getViewsType());
+
+		p = new Properties();
+		p.setProperty(Configuration.VIEWS_TYPE,   "JSP"); 
+		config = new Configuration(p);
+		assertEquals(ViewsType.JSP, config.getViewsType());
+
+		p = new Properties();
+		p.setProperty(Configuration.VIEWS_TYPE,   "thymeleaf"); 
+		config = new Configuration(p);
+		assertEquals(ViewsType.THYMELEAF, config.getViewsType());
+
+		p = new Properties();
+		p.setProperty(Configuration.VIEWS_TYPE,   "THYMELEAF"); 
+		config = new Configuration(p);
+		assertEquals(ViewsType.THYMELEAF, config.getViewsType());
+
+		p = new Properties();
+		p.setProperty(Configuration.VIEWS_TYPE,   " ThyMELeaf  "); 
+		config = new Configuration(p);
+		assertEquals(ViewsType.THYMELEAF, config.getViewsType());
 	}
 }

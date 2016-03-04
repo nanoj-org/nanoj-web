@@ -37,7 +37,7 @@ public class ActionFilter implements Filter  {
 	private final Configuration      configuration ;
 	private final ActionProcessor    actionProcessor ;
 	
-	private ConsoleLogger logger = ConsoleLogger.getLogger(ActionFilter.class);
+	private final ConsoleLogger      logger = ConsoleLogger.getLogger(ActionFilter.class);
 
 	/**
 	 * Constructor
@@ -53,14 +53,16 @@ public class ActionFilter implements Filter  {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		logger.trace("init()");
+		logger.info("NanoJ filer initialization");
 		//trace("Filter " + this.getClass().getSimpleName() + " initialized :" );
-		logger.trace(" . actions package        = '" + this.configuration.getActionsPackage() + "'" ) ;
-		logger.trace(" . default action         = '" + this.configuration.getDefaultAction() + "'" ) ;
-		logger.trace(" . actions provider class = '" + this.configuration.getActionsProviderClassName() + "'" ) ;
-		logger.trace(" . views folder           = '" + this.configuration.getViewsFolder() + "'" ) ;
-		logger.trace(" . views suffix           = '" + this.configuration.getViewsSuffix() + "'" ) ;
-		logger.trace(" . layouts folder         = '" + this.configuration.getLayoutsFolder() + "'" ) ;
+		logger.info(" . actions package        = '" + this.configuration.getActionsPackage() + "'" ) ;
+		logger.info(" . default action         = '" + this.configuration.getDefaultAction() + "'" ) ;
+		logger.info(" . actions provider class = '" + this.configuration.getActionsProviderClassName() + "'" ) ;
+		logger.info(" . views folder           = '" + this.configuration.getViewsFolder() + "'" ) ;
+		logger.info(" . views suffix           = '" + this.configuration.getViewsSuffix() + "'" ) ;
+		logger.info(" . layouts folder         = '" + this.configuration.getLayoutsFolder() + "'" ) ;
+		logger.info(" . layouts suffix         = '" + this.configuration.getLayoutsSuffix() + "'" ) ;
+		logger.info(" . views type             = '" + this.configuration.getViewsType() + "'" ) ;
 	}
 	
 	@Override
@@ -72,14 +74,6 @@ public class ActionFilter implements Filter  {
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) 
 						throws IOException, ServletException {
 		logger.trace("doFilter()");
-        
-        // TODO
-//		if ( request in action path ) {
-//			processAction(servletRequest, servletResponse);
-//		}
-//		else {
-//	        chain.doFilter(request, response);			
-//		}
         
         ActionInfo actionInfo = actionProcessor.processAction( (HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse );
         

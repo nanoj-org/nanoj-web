@@ -39,8 +39,6 @@ public class WebAppContextListener implements ServletContextListener {
         
         ConsoleLoggerProvider.setGlobalLevelThreshold(Level.OFF);
         
-
-        		
         ServletContext servletContext = servletContextEvent.getServletContext();
         Configuration configuration = loadConfiguration(servletContext);
         
