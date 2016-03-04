@@ -17,6 +17,8 @@ package org.nanoj.web.tinymvc.processor ;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -33,6 +35,7 @@ import org.nanoj.web.tinymvc.util.ConsoleLogger;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.thymeleaf.templateresolver.TemplateResolver;
 
 
 /**
@@ -96,6 +99,55 @@ public class ActionViewRenderer {
     }
 
     private void renderWithThymeleaf( ActionInfo actionInfo, ActionResult actionResult,
+    		HttpServletRequest request, HttpServletResponse response) {
+    	
+		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
+        // XHTML is the default mode, but we will set it anyway for better understanding of code
+        templateResolver.setTemplateMode("XHTML");
+        templateResolver.setCacheTTLMs(3600000L);
+        templateResolver.setCharacterEncoding("utf-8");
+
+        TemplateEngine templateEngine = new TemplateEngine();
+
+        //--- Define template with prefix and suffix 
+        String thymeleafTemplate = "?";
+        if ( actionResult.hasLayout() ) {
+        	
+        	thymeleafTemplate = actionResult.getLayout();
+        	
+        	//--- Multiple TemplateResolvers       	
+            logger.trace("Thymeleaf : 2 TemplateResolvers ( view + layout ) ");
+        	Set<TemplateResolver> templateResolvers = new HashSet<TemplateResolver>();
+        	templateResolvers.add( ThymeleafUtil.getViewTemplateResolver(configuration) );
+        	templateResolvers.add( ThymeleafUtil.getLayoutTemplateResolver(configuration) );
+        	templateEngine.setTemplateResolvers(templateResolvers);
+        }
+        else {
+        	thymeleafTemplate = actionResult.getView();
+        	
+        	//--- Only one TemplateResolver
+            logger.trace("Thymeleaf : only 'view' TemplateResolver ");
+            templateEngine.setTemplateResolver(ThymeleafUtil.getViewTemplateResolver(configuration));
+        }
+
+        logger.trace("Thymeleaf template : '" + thymeleafTemplate + "'");
+
+        
+        PrintWriter responseWriter ;
+        try {
+			responseWriter = response.getWriter();
+		} catch (IOException e) {
+			throw new TinyMvcException("Cannot get response writer (IOException)", e);
+		}
+
+        WebContext webContext = new WebContext(request, response, request.getServletContext(), request.getLocale());
+        // The template name will be 
+        // prefixed with templateResolver prefix ( e.g. "/WEB-INF/" ) 
+        // and suffixed with the templateResolver suffix ( e.g. ".html" )
+        templateEngine.process(thymeleafTemplate, webContext, responseWriter);
+    }
+
+    private void renderWithThymeleaf_BAK( ActionInfo actionInfo, ActionResult actionResult,
     		HttpServletRequest request, HttpServletResponse response) {
     	
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
