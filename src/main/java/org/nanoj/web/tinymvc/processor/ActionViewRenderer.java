@@ -31,6 +31,7 @@ import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.config.ViewsType;
 import org.nanoj.web.tinymvc.env.ActionInfo;
+import org.nanoj.web.tinymvc.env.ActionView;
 import org.nanoj.web.tinymvc.util.ConsoleLogger;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -54,33 +55,33 @@ public class ActionViewRenderer {
 		this.configuration = configuration ;
 	}
 
-    public void render( final String actionResultString, final ActionInfo actionInfo, 
+    public ActionView render( final String actionResultString, final ActionInfo actionInfo, 
     		final HttpServletRequest request, final HttpServletResponse response) {
 		
-		ActionResult actionResult = new ActionResult(actionResultString, configuration);
+		ActionView actionView = new ActionView(actionResultString, configuration);
 
-//		String targetPage = actionViewBuilder.getTargetPage(actionResultObject, actionInfo);
-		
-    	actionInfo.setViewPage( actionResult.getViewFullPath() );
-    	actionInfo.setViewLayout( actionResult.getLayoutFullPath() );
-
+//    	actionInfo.setViewPage( actionView.getViewPath() );
+//    	actionInfo.setViewLayout( actionView.getLayoutPath() );
+    	actionInfo.setActionView(actionView);
+    	
 		//--- Set action model in request scope
 		request.setAttribute("action", actionInfo);
 
 		if ( configuration.getViewsType() == ViewsType.THYMELEAF ) {
 			logger.trace("render with Thymeleaf...");
-			renderWithThymeleaf( actionInfo, actionResult, request, response);
+			renderWithThymeleaf( actionInfo, actionView, request, response);
 		}
 		else {
 			logger.trace("render with JSP...");
-			renderWithJSP( actionInfo, actionResult, request, response); 
+			renderWithJSP( actionInfo, actionView, request, response); 
 		}
+		return actionView ;
     }
 
-    private void renderWithJSP( ActionInfo actionInfo, ActionResult actionResult,
+    private void renderWithJSP( ActionInfo actionInfo, ActionView actionView,
     		HttpServletRequest request, HttpServletResponse response) {
     	
-		String targetPage = actionResult.getTargetFullPath();
+		String targetPage = actionView.getViewPath();
 		if ( StrUtil.nullOrVoid(targetPage) ) {
 			throw new TinyMvcException("No target page for action '" + actionInfo.getName() + "'");
 		}
@@ -98,7 +99,7 @@ public class ActionViewRenderer {
 		}
     }
 
-    private void renderWithThymeleaf( ActionInfo actionInfo, ActionResult actionResult,
+    private void renderWithThymeleaf( ActionInfo actionInfo, ActionView actionView,
     		HttpServletRequest request, HttpServletResponse response) {
     	
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
@@ -111,9 +112,9 @@ public class ActionViewRenderer {
 
         //--- Define template with prefix and suffix 
         String thymeleafTemplate = "?";
-        if ( actionResult.hasLayout() ) {
+        if ( actionView.hasLayout() ) {
         	
-        	thymeleafTemplate = actionResult.getLayout();
+        	thymeleafTemplate = actionView.getLayoutName();
         	
         	//--- Multiple TemplateResolvers       	
             logger.trace("Thymeleaf : 2 TemplateResolvers ( view + layout ) ");
@@ -123,7 +124,7 @@ public class ActionViewRenderer {
         	templateEngine.setTemplateResolvers(templateResolvers);
         }
         else {
-        	thymeleafTemplate = actionResult.getView();
+        	thymeleafTemplate = actionView.getPageName();
         	
         	//--- Only one TemplateResolver
             logger.trace("Thymeleaf : only 'view' TemplateResolver ");
@@ -146,54 +147,4 @@ public class ActionViewRenderer {
         // and suffixed with the templateResolver suffix ( e.g. ".html" )
         templateEngine.process(thymeleafTemplate, webContext, responseWriter);
     }
-
-    private void renderWithThymeleaf_BAK( ActionInfo actionInfo, ActionResult actionResult,
-    		HttpServletRequest request, HttpServletResponse response) {
-    	
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
-        // XHTML is the default mode, but we will set it anyway for better understanding of code
-        templateResolver.setTemplateMode("XHTML");
-        templateResolver.setCacheTTLMs(3600000L);
-        templateResolver.setCharacterEncoding("utf-8");
-
-        //--- Define template with prefix and suffix 
-        String thymeleafTemplate = "?";
-        String thymeleafPrefix   = "?";
-        String thymeleafSuffix   = "?";
-        if ( actionResult.hasLayout() ) {
-        	thymeleafTemplate = actionResult.getLayout();
-        	thymeleafPrefix   = configuration.getLayoutsFolder() ; // e.g. "/WEB-INF/layouts/"
-        	thymeleafSuffix   = configuration.getLayoutsSuffix() ; // e.g. ".jsp" or ".html"
-        }
-        else {
-        	thymeleafTemplate = actionResult.getView();
-        	thymeleafPrefix   = configuration.getViewsFolder() ; // e.g. "/WEB-INF/views/"
-        	thymeleafSuffix   = configuration.getViewsSuffix() ; // e.g. ".jsp" or ".html"
-        }
-
-        logger.trace("Thymeleaf prefix   : '" + thymeleafPrefix   + "'");
-        logger.trace("Thymeleaf template : '" + thymeleafTemplate + "'");
-        logger.trace("Thymeleaf suffix   : '" + thymeleafSuffix   + "'");
-
-        templateResolver.setPrefix( thymeleafPrefix ); 
-        templateResolver.setSuffix( thymeleafSuffix ); 
-
-        TemplateEngine templateEngine = new TemplateEngine();
-        templateEngine.setTemplateResolver(templateResolver);
-        
-        
-        PrintWriter responseWriter ;
-        try {
-			responseWriter = response.getWriter();
-		} catch (IOException e) {
-			throw new TinyMvcException("Cannot get response writer (IOException)", e);
-		}
-
-        WebContext webContext = new WebContext(request, response, request.getServletContext(), request.getLocale());
-        // The template name will be 
-        // prefixed with templateResolver prefix ( e.g. "/WEB-INF/" ) 
-        // and suffixed with the templateResolver suffix ( e.g. ".html" )
-        templateEngine.process(thymeleafTemplate, webContext, responseWriter);
-    }
-
 }

@@ -13,82 +13,93 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.nanoj.web.tinymvc.processor ;
+package org.nanoj.web.tinymvc.env ;
 
 import org.nanoj.util.StrUtil;
 import org.nanoj.web.tinymvc.config.Configuration;
 
 /**
- * TINY MVC Action Result
+ * Object containing information about the action view <br>
  * 
- * @author Laurent Guerin
+ * @author Laurent GUERIN
  */
-public class ActionResult {
+public class ActionView {
 	
 	//--- Attributes
-	private final String view ;
-	private final String viewFullPath ;
-	private final String layout ;
-	private final String layoutFullPath ;
+	private final String originalResult ;
+	private final String pageName ;
+	private final String pagePath ;
+	private final String layoutName ;
+	private final String layoutPath ;
 
 	/**
 	 * Constructor
 	 * @param actionResult actionResult string : 'view' or 'view:layout'
 	 * @param configuration
 	 */
-	public ActionResult( String actionResult, Configuration configuration ) {
+	public ActionView( String actionResult, Configuration configuration ) {
 		super();
 		if ( StrUtil.nullOrVoid(actionResult) ) {
 			throw new IllegalArgumentException("Action result is null or void");
 		}
-		
+		this.originalResult = actionResult ;
 		// Simple names
 		int pos = actionResult.indexOf(':') ; 
 		if ( pos < 0 ) {
 			// No ':'
-			view = actionResult.trim() ;
-			layout = null ;
+			pageName = actionResult.trim() ;
+			layoutName = null ;
 		}
 		else {
-			view   = actionResult.substring(0, pos).trim() ;
+			pageName   = actionResult.substring(0, pos).trim() ;
 			String s = actionResult.substring(pos+1, actionResult.length()).trim() ;
 			if ( s.length() == 0 ) {
-				layout = null ;
+				layoutName = null ;
 			}
 			else {
-				layout = s ;
+				layoutName = s ;
 			}
 		}
-		if ( view.length() == 0) {
+		if ( pageName.length() == 0) {
 			throw new IllegalArgumentException("Action view is void");
 		}
 
 		// Full paths
-		viewFullPath = getPageFullPath(view, configuration);
-		if ( layout != null ) {
-			layoutFullPath = getLayoutFullPath(layout, configuration);
+		pagePath = getPageFullPath(pageName, configuration);
+		if ( layoutName != null ) {
+			layoutPath = getLayoutFullPath(layoutName, configuration);
 		}
 		else {
-			layoutFullPath = null ;
+			layoutPath = null ;
 		}
 	}
 
 	//------------------------------------------------------------------------------
 	/**
-	 * Returns the view name in short format (never null) <br>
+	 * Returns original result (never null) <br>
+	 * e.g. : "mypage" or "mypage : mylayout"
+	 * @return 
+	 */
+	public String getOriginalResult() {
+    	return originalResult;
+    }
+
+	//------------------------------------------------------------------------------
+	/**
+	 * Returns the page name in short format (never null) <br>
 	 * e.g. : "mypage"
 	 * @return 
 	 */
-	public String getView() {
-    	return view;
+	public String getPageName() {
+    	return pageName;
     }
 	/**
-	 * Returns the view in 'full path' format (never null) <br>
+	 * Returns the page path in the current web-app (never null) <br>
 	 * e.g. : "/WEB-INF/views/mypage.jsp"
 	 * @return
 	 */
-	public String getViewFullPath() {
-    	return viewFullPath;
+	public String getPagePath() {
+    	return pagePath;
     }
 
 	//------------------------------------------------------------------------------
@@ -97,39 +108,55 @@ public class ActionResult {
 	 * e.g. : "mylayout"
 	 * @return
 	 */
-	public String getLayout() {
-    	return layout;
+	public String getLayoutName() {
+    	return layoutName;
     }
 	/**
-	 * Returns the layout name in 'full path'  format (can be null) <br>
+	 * Returns the layout path in the current web-app (can be null) <br>
 	 * e.g. : "/WEB-INF/layouts/mylayout.jsp"
 	 * @return
 	 */
-	public String getLayoutFullPath() {
-    	return layoutFullPath;
+	public String getLayoutPath() {
+    	return layoutPath;
     }
 	/**
 	 * Returns true if the action result has a layout 
 	 * @return
 	 */
 	public boolean hasLayout() {
-    	return layout != null ;
+    	return layoutName != null ;
     }
 
 	//------------------------------------------------------------------------------
 	/**
-	 * Returns the target full path ( view page full path or layout full path )
+	 * Returns the view name ( page name or layout name if any ) <br>
+	 * e.g. : "mypage" or "mylayout"
 	 * @return
 	 */
-	public String getTargetFullPath() {
-		if ( layoutFullPath != null ) {
-	    	return layoutFullPath;
+	public String getViewName() {
+		if ( layoutName != null ) {
+	    	return layoutName;
 		}
 		else {
-			return viewFullPath;
+			return pageName;
+		}
+    }
+
+	/**
+	 * Returns the view path ( page path or layout path if any ) <br>
+	 * e.g. : "/WEB-INF/views/mypage.jsp" or "/WEB-INF/layouts/mylayout.jsp"
+	 * @return
+	 */
+	public String getViewPath() {
+		if ( layoutPath != null ) {
+	    	return layoutPath;
+		}
+		else {
+			return pagePath;
 		}
     }
 	
+	//------------------------------------------------------------------------------
     /**
      * Returns view page full path
      * @param pageName

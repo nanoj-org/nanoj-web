@@ -17,7 +17,6 @@
 package org.nanoj.web.tinymvc.processor;
 
 import org.nanoj.web.tinymvc.config.Configuration;
-import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 public class ThymeleafUtil {
@@ -29,7 +28,7 @@ public class ThymeleafUtil {
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
         // XHTML is the default mode, but we will set it anyway for better understanding of code
         templateResolver.setTemplateMode("XHTML");
-        templateResolver.setCacheTTLMs(3600000L);
+        templateResolver.setCacheTTLMs(3600000L); // TODO : parameter in configuration file
         templateResolver.setCharacterEncoding("utf-8");
 
         

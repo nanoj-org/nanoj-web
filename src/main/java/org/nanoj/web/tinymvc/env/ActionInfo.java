@@ -39,14 +39,14 @@ public class ActionInfo {
 	
 	private final String method ;
 
-	private String className = null ;
-	private String methodCalled = null ;
-	private String result = null ;
+	private String controllerClass  = null ;
+	private String controllerMethod = null ;
+	private String controllerResult = null ;
 
-	private String viewLayout = null ;
-
-	private String viewPage = null ;
-
+//	private String viewLayout = null ;
+//	private String viewPage = null ;
+	private ActionView actionView = null ;
+	
 	/**
 	 * Constructor
 	 * @param request
@@ -116,63 +116,93 @@ public class ActionInfo {
 	}
 
 	//---------------------------------------------------------------------------------
-	public void setClassName(String className) {
-		this.className = className;
-	}
-	public String getClassName() {
-		return className;
-	}
-	
-	//---------------------------------------------------------------------------------
-	public void setMethodCalled(String methodCalled) {
-		this.methodCalled = methodCalled;
-	}
-	public String getMethodCalled() {
-		return methodCalled;
-	}
-	
-	//---------------------------------------------------------------------------------
-	public void setResult(String result) {
-		this.result = result;
-	}
-	public String getResult() {
-		return result;
-	}
-	
-	//---------------------------------------------------------------------------------
-	public String getViewLayout() {
-		return viewLayout;
-	}
-	public void setViewLayout(String viewLayout) {
-		this.viewLayout = viewLayout;
+	/**
+	 * Set information regarding the processing result (after class.method execution)
+	 * @param className
+	 * @param methodCalled
+	 * @param result
+	 */
+	public void setProcessingResult(String className, String methodCalled, String result ) {
+		this.controllerClass = className;
+		this.controllerMethod = methodCalled;
+		this.controllerResult = result;
 	}
 
+	/**
+	 * Returns the controller class used to process the action <br>
+	 * e.g. : "ComputeAction" Java class   
+	 * @return
+	 */
+	public String getControllerClass() {
+		return controllerClass;
+	}
+	
+	/**
+	 * Returns the controller method used to process the action <br>
+	 * ( a method of the controller class ) <br>
+	 * e.g. : "add" Java method ( defined in "ComputeAction" Java class )
+	 * @return
+	 */
+	public String getControllerMethod() {
+		return controllerMethod;
+	}
+	
+	public String getControllerResult() {
+		return controllerResult;
+	}
+	
 	//---------------------------------------------------------------------------------
-	public String getViewPage() {
-		return viewPage;
+	public void setActionView(ActionView actionView) {
+		this.actionView = actionView ;
 	}
-	public void setViewPage(String viewPage) {
-		this.viewPage = viewPage;
+	
+	public String getViewName() {
+		return actionView != null ? actionView.getViewName() : null ;
 	}
+	public String getViewPath() {
+		return actionView != null ? actionView.getViewPath() : null ;
+	}
+	public String getViewPageName() {
+		return actionView != null ? actionView.getPageName() : null ;
+	}
+	public String getViewPagePath() {
+		return actionView != null ? actionView.getPagePath() : null ;
+	}
+	public String getViewLayoutName() {
+		return actionView != null ? actionView.getLayoutName() : null ;
+	}
+	public String getViewLayoutPath() {
+		return actionView != null ? actionView.getLayoutPath() : null ;
+	}
+//	public void setViewLayout(String viewLayout) {
+//		this.viewLayout = viewLayout;
+//	}
+
+//	public void setViewPage(String viewPage) {
+//		this.viewPage = viewPage;
+//	}
 
 	//---------------------------------------------------------------------------------
-	public String getView() {
-		if ( viewLayout != null ) {
-			return viewLayout + ":" + viewPage ;
-		}
-		else {
-			return viewPage;
-		}
-	}
+//	public String getView() {
+//		if ( viewLayout != null ) {
+//			return viewLayout + ":" + viewPage ;
+//		}
+//		else {
+//			return viewPage;
+//		}
+//	}
 	//---------------------------------------------------------------------------------
 	@Override
 	public String toString() {
 		return "[  name=" + name 
 				+ ", originalName=" + originalName 
 				+ ", method=" + method 
-				+ ", className=" + className 
-				+ ", viewLayout=" + viewLayout 
-				+ ", viewPage=" + viewPage 
+				+ ", controllerClass=" + controllerClass 
+				+ ", controllerMethod=" + controllerMethod
+				+ ", controllerResult=" + controllerResult
+				+ ", viewLayoutName=" + getViewLayoutName() 
+				+ ", viewPageName=" + getViewPageName()
+				+ ", viewPageName=" + getViewName()
 				+ "]";
 	}
 	

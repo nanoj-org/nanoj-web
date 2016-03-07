@@ -68,7 +68,6 @@ public class ActionProcessor {
 		//--- Initialize ActionProvider
 		String actionProviderClassName = configuration.getActionsProviderClassName() ;
 		String actionsPackage          = configuration.getActionsPackage();
-//		String defaultAction           = configuration.getDefaultAction();
 		
 		if ( actionProviderClassName != null ) {
 			//--- Get instance of the action provider class (defined in configuration)
@@ -78,14 +77,6 @@ public class ActionProcessor {
 		else {
 			//--- No specific action provider class defined => use the standard action provider based on "Convention over Configuration"
 			if ( actionsPackage != null ) {
-//		    	trace("actions package = '" + actionsPackage + "'");
-//				if ( defaultAction != null ) {
-//			    	trace("default action = '" + defaultAction + "'");
-//				}
-//				else {
-//			    	trace("no default action ");
-//				}
-//				this.actionProvider = new StandardActionProvider( actionsPackage, defaultAction ) ;
 				this.actionProvider = new StandardActionProvider( actionsPackage ) ;
 		    	trace("action provider initialized ( class = " + StandardActionProvider.class.getCanonicalName() + " )");
 			}
@@ -111,10 +102,10 @@ public class ActionProcessor {
 		String actionResult = executeAction(actionInfo, request, response);
 		
 		if ( actionResult == null ) {
-			throw new TinyMvcException("Action result is null (action " + actionInfo.getClassName() + ")" );
+			throw new TinyMvcException("Action result is null (action " + actionInfo.getControllerClass() + ")" );
 		}
 		if ( actionResult.trim().length() == 0 ) {
-			throw new TinyMvcException("Action result is void (action " + actionInfo.getClassName() + ")" );
+			throw new TinyMvcException("Action result is void (action " + actionInfo.getControllerClass() + ")" );
 		}
 
 		//--- 3) Dispatch (forward) to VIEW ( with or without template )  				
@@ -123,12 +114,12 @@ public class ActionProcessor {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("cannot render action '" + actionInfo.getName() 
-					+ "' --> " + actionInfo.getClassName() + "." + actionInfo.getMethod() + "()"
+					+ "' --> " + actionInfo.getControllerClass() + "." + actionInfo.getMethod() + "()"
 					+ " --> result = '" + actionResult +"'" );
-			logger.error(" . result      = '" + actionInfo.getResult() + "'" );
-			logger.error(" . view        = '" + actionInfo.getView() + "'" );
-			logger.error(" . view layout = '" + actionInfo.getViewLayout() + "'" );
-			logger.error(" . view page   = '" + actionInfo.getViewPage() + "'" );
+			logger.error(" . result      = '" + actionInfo.getControllerResult() + "'" );
+			logger.error(" . view        = '" + actionInfo.getViewName() + "'" );
+			logger.error(" . view layout = '" + actionInfo.getViewLayoutName() + "'" );
+			logger.error(" . view page   = '" + actionInfo.getViewPageName() + "'" );
 		}
 		
 		return actionInfo ;
@@ -188,8 +179,10 @@ public class ActionProcessor {
 			action.afterAction(methodToCall, request, response);
 		}
 
-		actionInfo.setMethodCalled(methodToCall);
-		actionInfo.setResult(actionResult);
+//		actionInfo.setClassName( action.getClass().getSimpleName() );
+//		actionInfo.setMethodCalled(methodToCall);
+//		actionInfo.setResult(actionResult);
+		actionInfo.setProcessingResult(action.getClass().getSimpleName(), methodToCall, actionResult);
 		
     	trace ("action result = '" + actionResult + "'");
     	return actionResult ;
@@ -212,8 +205,6 @@ public class ActionProcessor {
 		if ( null == action ) {
 			throw new TinyMvcException("Cannot get action '" + actionInfo.getName() + "' (not defined)" );
 		}
-		
-		actionInfo.setClassName( action.getClass().getSimpleName() );
 		
 		return action ;
     }

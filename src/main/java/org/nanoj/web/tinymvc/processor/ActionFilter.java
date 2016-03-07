@@ -30,6 +30,15 @@ import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 import org.nanoj.web.tinymvc.util.ConsoleLogger;
 
+/**
+ * The NanoJ servlet filter<br>
+ * The unique web entry point to invoke controllers <br>
+ * This filter is created programmatically by a 'ServletContextListener' <br>
+ * Its 'url pattern' is defined in the NanoJ configuration file <br>
+ * 
+ * @author Laurent GUERIN
+ *
+ */
 //@WebFilter( filterName="zzz-nanoj", urlPatterns = {"/*"} )
 //@WebFilter( filterName="aaa-nanoj", urlPatterns = {"/*"} )
 public class ActionFilter implements Filter  {
@@ -77,11 +86,15 @@ public class ActionFilter implements Filter  {
         
         ActionInfo actionInfo = actionProcessor.processAction( (HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse );
         
-        logger.trace("action '" + actionInfo.getName() +"' "
-        		+ "--> " + actionInfo.getClassName() + "." + actionInfo.getMethodCalled() + "() "
-        		+ "--> '" + actionInfo.getResult() + "' "
-        		+ "--> '" + actionInfo.getView() + "' " 
-        		);
+        logger.trace("action name '" + actionInfo.getName() +"' " );
+        logger.trace(" controller --> " + actionInfo.getControllerClass() + "." + actionInfo.getControllerMethod() + "() ");
+        logger.trace(" result     --> '" + actionInfo.getControllerResult() + "' " ) ;
+        logger.trace(" view name  --> '" + actionInfo.getViewName() + "' ( path = '" + actionInfo.getViewPath() + "' )" );
+        logger.trace(" view page   '" + actionInfo.getViewPageName() + "' ( path = '" + actionInfo.getViewPagePath() + "' )" );
+        logger.trace(" view layout '" + actionInfo.getViewLayoutName() + "' ( path = '" + actionInfo.getViewLayoutPath() + "' )" );
+        
+//        		+ "--> '" + actionInfo.getViewPageName() + "' (layout '" + actionInfo.getViewLayoutName() + "')" 
+//        		);
 	}
 	
 }
