@@ -26,6 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.nanoj.web.tinymvc.TinyMvcActionNotFoundException;
 import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 import org.nanoj.web.tinymvc.util.ConsoleLogger;
@@ -82,19 +83,39 @@ public class ActionFilter implements Filter  {
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) 
 						throws IOException, ServletException {
-		logger.trace("doFilter()");
+		
+		HttpServletRequest  httpServletRequest  = (HttpServletRequest)servletRequest;
+		HttpServletResponse httpServletResponse = (HttpServletResponse)servletResponse;
+		
+		logger.trace("doFilter() : URI = '" + httpServletRequest.getRequestURI() + "', pathInfo = '" + httpServletRequest.getPathInfo() + "'");
         
-        ActionInfo actionInfo = actionProcessor.processAction( (HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse );
+        ActionInfo actionInfo;
+		try {
+			// Try to process the request path as an action
+			actionInfo = actionProcessor.processAction( httpServletRequest, httpServletResponse );
+
+			logger.trace("action name '" + actionInfo.getName() +"' " );
+	        logger.trace(" controller --> " + actionInfo.getControllerClass() + "." + actionInfo.getControllerMethod() + "() ");
+	        logger.trace(" result     --> '" + actionInfo.getControllerResult() + "' " ) ;
+	        logger.trace(" view name  --> '" + actionInfo.getViewName() + "' ( path = '" + actionInfo.getViewPath() + "' )" );
+	        logger.trace(" view page   '" + actionInfo.getViewPageName() + "' ( path = '" + actionInfo.getViewPagePath() + "' )" );
+	        logger.trace(" view layout '" + actionInfo.getViewLayoutName() + "' ( path = '" + actionInfo.getViewLayoutPath() + "' )" );
+	        
+		} catch (TinyMvcActionNotFoundException e) {
+			
+			// Action not processed due to "Action not found"
+			logger.trace("action not found for '" + httpServletRequest.getRequestURI() +"' => chain..." );
+			// Try to get another standard resource
+			chain.doFilter(servletRequest, servletResponse);
+		}
         
-        logger.trace("action name '" + actionInfo.getName() +"' " );
-        logger.trace(" controller --> " + actionInfo.getControllerClass() + "." + actionInfo.getControllerMethod() + "() ");
-        logger.trace(" result     --> '" + actionInfo.getControllerResult() + "' " ) ;
-        logger.trace(" view name  --> '" + actionInfo.getViewName() + "' ( path = '" + actionInfo.getViewPath() + "' )" );
-        logger.trace(" view page   '" + actionInfo.getViewPageName() + "' ( path = '" + actionInfo.getViewPagePath() + "' )" );
-        logger.trace(" view layout '" + actionInfo.getViewLayoutName() + "' ( path = '" + actionInfo.getViewLayoutPath() + "' )" );
-        
-//        		+ "--> '" + actionInfo.getViewPageName() + "' (layout '" + actionInfo.getViewLayoutName() + "')" 
-//        		);
 	}
 	
+//	private boolean isStaticFileURI( HttpServletRequest servletRequest ) {
+//		String pathInfo = servletRequest.getPathInfo() ;
+//		if ( pathInfo != null ) {
+//			
+//		}
+//		return false ;
+//	}
 }

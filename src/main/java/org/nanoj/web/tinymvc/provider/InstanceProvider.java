@@ -47,7 +47,7 @@ public class InstanceProvider {
 			return clazz ;
 		}
 		else {
-			throw new TinyMvcException("Class name is null" );
+			throw new IllegalArgumentException("Class name is null" );
 		}
 	}
 	
@@ -60,7 +60,7 @@ public class InstanceProvider {
 	public final static <T> T createInstance(String className, Class<T> superClass ) {
 		
 		if ( null == superClass ) {
-			throw new TinyMvcException("Super class is null" );
+			throw new IllegalArgumentException("Super class is null" );
 		}
 		
 		Class<?> clazz = loadClass(className) ;
@@ -75,7 +75,7 @@ public class InstanceProvider {
 	 * @return
 	 */
 	//@SuppressWarnings("unchecked")
-	public final static <T> T createInstance(Class<?> clazz, Class<T> superClass ) {
+	private final static <T> T createInstance(Class<?> clazz, Class<T> superClass ) {
 		
 		if ( superClass.isAssignableFrom(clazz) ) {
 			@SuppressWarnings("unchecked")

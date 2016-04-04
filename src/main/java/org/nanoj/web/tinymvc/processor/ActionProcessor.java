@@ -23,13 +23,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.nanoj.util.StrUtil;
 import org.nanoj.web.tinymvc.Action;
+import org.nanoj.web.tinymvc.TinyMvcActionNotFoundException;
 import org.nanoj.web.tinymvc.TinyMvcException;
 import org.nanoj.web.tinymvc.config.Configuration;
 import org.nanoj.web.tinymvc.env.ActionInfo;
 import org.nanoj.web.tinymvc.env.FieldValuesManager;
 import org.nanoj.web.tinymvc.provider.ActionProvider;
-import org.nanoj.web.tinymvc.provider.StandardActionProvider;
 import org.nanoj.web.tinymvc.provider.InstanceProvider;
+import org.nanoj.web.tinymvc.provider.StandardActionProvider;
 import org.nanoj.web.tinymvc.util.ConsoleLogger;
 
 
@@ -92,7 +93,7 @@ public class ActionProcessor {
 	 * @param response
 	 * @return information about the action processed
 	 */
-	public ActionInfo processAction(HttpServletRequest request, HttpServletResponse response) {
+	public ActionInfo processAction(HttpServletRequest request, HttpServletResponse response) throws TinyMvcActionNotFoundException {
         
 		//--- 1) Get action information from the request URL
 		ActionInfo actionInfo = actionParser.parseActionURI(request);
@@ -144,7 +145,7 @@ public class ActionProcessor {
      * @return
      */
     private String executeAction(final ActionInfo actionInfo, 
-    		final HttpServletRequest request, final HttpServletResponse response )  {
+    		final HttpServletRequest request, final HttpServletResponse response ) throws TinyMvcActionNotFoundException {
     	
 		//--- Get the action controller ( associated with the action name )
 		Action action = getAction( actionInfo ) ;
@@ -193,17 +194,21 @@ public class ActionProcessor {
      * @param actionName
      * @return
      */
-    private Action getAction( final ActionInfo actionInfo )  {
+    private Action getAction( final ActionInfo actionInfo ) throws TinyMvcActionNotFoundException {
     	
     	trace("getAction('" + actionInfo.getName() + "')" );
     	
-//		if ( null == this.actionProvider ) {
-//			throw new TinyMvcException("Action provider is not initialized");
-//		}
+		Action action;
 		
-		Action action = this.actionProvider.getAction( actionInfo.getName() ) ;
+		try {
+			action = this.actionProvider.getAction( actionInfo.getName() );
+		} catch (TinyMvcException e) {
+			throw new TinyMvcActionNotFoundException(actionInfo.getName(), e);
+		}
+		
 		if ( null == action ) {
-			throw new TinyMvcException("Cannot get action '" + actionInfo.getName() + "' (not defined)" );
+			//throw new TinyMvcActionNotFoundException("Cannot get action '" + actionInfo.getName() + "' (not defined)" );
+			throw new TinyMvcActionNotFoundException(actionInfo.getName() );
 		}
 		
 		return action ;

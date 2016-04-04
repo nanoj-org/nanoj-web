@@ -48,7 +48,7 @@ public class SpecificActionProvider implements ActionProvider {
 			this.map = map;
 		}
 		else {
-			throw new TinyMvcException("Map argument is null" );
+			throw new IllegalArgumentException("Map argument is null" );
 		}
 	}
 
@@ -57,28 +57,14 @@ public class SpecificActionProvider implements ActionProvider {
 	public final Action getAction(String actionConventionalName ) {
 		
 		if ( null == actionConventionalName ) {
-			throw new TinyMvcException("Action name is null" );
+			throw new IllegalArgumentException("Action name is null" );
 		}
 		
-//		String actionName2 = actionName.trim().toLowerCase() ;
 		Class<? extends Action > actionClass = map.get( actionConventionalName ) ;
-		if ( null == actionClass ) {
-			throw new TinyMvcException("No action class for '" + actionConventionalName + "'");
+		if ( actionClass != null ) {
+			return InstanceProvider.createInstance(actionClass) ;
 		}
-			
-//		Action actionInstance;
-//		try {
-//			actionInstance = actionClass.newInstance();
-//		} catch (InstantiationException e) {
-//			throw new TinyMvcException("Cannot instantiate " + actionClass.getCanonicalName(), e );
-//		} catch (IllegalAccessException e) {
-//			throw new TinyMvcException("Cannot instantiate " + actionClass.getCanonicalName(), e );
-//		}
-//		
-//		return actionInstance ;
-
-//		return InstanceProvider.createInstance(actionClass, Action.class) ;
-		return InstanceProvider.createInstance(actionClass) ;
+		return null ; // No class found for this action
 	}
 	
 }

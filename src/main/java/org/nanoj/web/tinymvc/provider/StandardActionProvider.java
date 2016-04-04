@@ -17,6 +17,7 @@ package org.nanoj.web.tinymvc.provider ;
 
 import org.nanoj.util.StrUtil;
 import org.nanoj.web.tinymvc.Action;
+import org.nanoj.web.tinymvc.TinyMvcActionNotFoundException;
 import org.nanoj.web.tinymvc.TinyMvcException;
 
 
@@ -31,30 +32,25 @@ public class StandardActionProvider implements ActionProvider {
 
 	private final String actionsPackageWithEndingPoint ;
 
-	//private final String defaultActionName ;
-		
 	/**
 	 * Constructor <br>
 	 * 
 	 * @param actionsPackage  the actions package name 
 	 */
-//	public StandardActionProvider(String actionsPackage, String defaultAction) {
 	public StandardActionProvider(String actionsPackage) {
 		super();
 		
 		//--- Build the actions package name 
 		if ( null == actionsPackage ) {
-			throw new TinyMvcException("Cannot create DefaultActionProvider : actions package is null");
+			throw new IllegalArgumentException("Cannot create DefaultActionProvider : actions package is null");
 		}
+		
 		if ( actionsPackage.endsWith(".") ) {
 			this.actionsPackageWithEndingPoint = actionsPackage ;
 		}
 		else {
 			this.actionsPackageWithEndingPoint = actionsPackage + "." ;
 		}
-
-		//--- Set the default action 
-		//this.defaultActionName  = defaultAction ; // Can be null 
 	} 
 
 
@@ -62,17 +58,11 @@ public class StandardActionProvider implements ActionProvider {
 	public final Action getAction(String actionName ) {
 		
 		if ( actionName == null ) {
-			throw new TinyMvcException("Action name is null" );
+			throw new IllegalArgumentException("Action name is null" );
 		}
 		
 		if ( actionName.trim().length() == 0 ) {
-			throw new TinyMvcException("Action name is null" );
-//			if ( this.defaultActionName != null ) {
-//				actionName = this.defaultActionName ;
-//			}
-//			else {
-//				throw new TinyMvcException("No action name and no default action" );
-//			}
+			throw new IllegalArgumentException("Action name is void" );
 		}
 		
 		//--- Full class name ( e.g. "org.demo.actions.DoSomethingAction" ) 
